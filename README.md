@@ -1,24 +1,30 @@
-# homelab
+# homelab (under construction)
 This repository holds configurations and documentation of my home lab and wireless testbed. 
 
-### Lab Topology
+The lab environment is intended to run under a configuration-as-code model, with all configuration of both virtual machines and containers being handled by Ansible (or possibly Terraform). 
 
-### Kubernetes Architecture
+#### Lab Topology
+
+![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology.jpg?raw=true)
+
+#### Kubernetes Architecture
+
+![alt text](https://github.com/stevenplatt/homelab/blob/main/img/kubernetes_architecture.jpg?raw=true)
 
 ## Containers
 The following containers are deployed with the Kebernetes cluster environment
 
-- Apache Guacamole
-- NextCloud
-- PiHole
-- OpenVPN
-- Librespeed
-- VSCode Server
+- Apache Guacamole (web remote access)
+- NextCloud (Google Apps substitue)
+- PiHole (ad blocking)
+- OpenVPN (vpn)
+- Librespeed (speed test)
+- VSCode Server (Visual Studio Code in the browser)
 - Nginx (Static Sites)
-- Ansible
-- Grafana
-- Python Dynamic DNS Script
-- OpenWRT
+- Ansible (configuration management)
+- Grafana (logging dashboard)
+- Python Dynamic DNS Script (update DNS if ISP changed IP)
+- OpenWRT (WiFi Router OS)
 - BlueberryFi (OpenWRT testbed UI)
 - Python Cloud Phone (pending)
 - HTTPS Proxy (pending)
@@ -29,5 +35,5 @@ The following virtual machines are deployed within Proxmox
 - Windows 10
 - Ubuntu Desktop
 - Fedora Workstation
-- Open Air Interface (OAI)
-- FlexRAN
+- Open Air Interface (4G/5G Core Network Testbed)
+- FlexRAN (Network Slicing Testbed)
