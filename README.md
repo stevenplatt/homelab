@@ -25,11 +25,11 @@ The kubernetes clusters within the environment are each deployed using Rancher v
 
 Deploying kubernetes in this configuration allows for [high availability](https://rancher.com/docs/k3s/latest/en/architecture/) (ignoring hardware redundancy). This means that if a VM is powered off by accidents, corrupted, or otherwise not available, the services running the environment will stay online. 
 
-A number of components are required to site outside of the Kubernetes cluster for the high availability configuration to work, these include NGINX serving as a load balancer in front of the active/active kubernetes masters, and a database that holds the kubernetes cluster configuration. Rather than deploying these external components to more brittle virtual machines, or an isolated docker environment, the second kubernetes cluster is added. Each cluster runs these external services as containers in the other cluster, so they benefit from high availability. Finally, the external database holding the cluster configurations is itself backed-up to off-site cloud storage.
+A number of components are required to sit outside of the Kubernetes cluster for the high availability configuration to work; these include NGINX serving as a load balancer in front of the active/active kubernetes masters, and a database that holds the kubernetes cluster configuration. Rather than deploying these external components to more brittle virtual machines, or an isolated docker environment, the second kubernetes cluster is added. Each cluster runs these external services as containers in the other cluster to benefit from high availability. Finally, the external database holding the cluster configuration is itself backed-up to off-site cloud storage.
 
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/img/kubernetes_architecture.jpg?raw=true)
 
-The environment does not include any observability tools, such as Istio or Apache Skywalker, since most of the services run as single containers and are not networks or accessing other resources. These may be added in the future. 
+The environment does not include any observability tools, such as Istio or Apache Skywalker, since most of the services run as single containers and are not networks or accessing other resources. This may change in the future. 
 
 ## Container List
 The following containers are deployed with the Kebernetes cluster environment
