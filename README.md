@@ -1,7 +1,7 @@
 # homelab (under construction)
 This repository holds configurations and documentation of my home lab and wireless testbed. 
 
-The lab environment is intended to run under a configuration-as-code model, with all configuration of both virtual machines and containers being handled by Ansible (or possibly Terraform). 
+The lab environment is intended to run under a configuration-as-code model, with all configuration of both virtual machines and containers being handled by Ansible (or possibly Terraform). Visit the Wiki of this repository for more detailed information of how to run the configuration scripts to built this environment. 
 
 ### Lab Overview
 
@@ -23,7 +23,7 @@ The kubernetes clusters within the environment are each deployed using Rancher v
 - Kubernetes Worker (3x K3s Agent)
 - Longhorn Storage Node (3x Longhorn)
 
-Deploying kubernetes in this configuration allows for high availability (ignoring hardware redundancy). This means that if a VM is powered off by accidents, corrupted, or otherwise not available, the services running the environment will stay online. 
+Deploying kubernetes in this configuration allows for [high availability](https://rancher.com/docs/k3s/latest/en/architecture/) (ignoring hardware redundancy). This means that if a VM is powered off by accidents, corrupted, or otherwise not available, the services running the environment will stay online. 
 
 A number of components are required to site outside of the Kubernetes cluster for the high availability configuration to work, these include NGINX serving as a load balancer in front of the active/active kubernetes masters, and a database that holds the kubernetes cluster configuration. Rather than deploying these external components to more brittle virtual machines, or an isolated docker environment, the second kubernetes cluster is added. Each cluster runs these external services as containers in the other cluster, so they benefit from high availability. Finally, the external database holding the cluster configurations is itself backed-up to off-site cloud storage.
 
