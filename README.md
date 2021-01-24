@@ -3,15 +3,15 @@ This repository holds configurations and documentation of my home lab and wirele
 
 The lab environment is intended to run under a configuration-as-code model, with all configuration of both virtual machines and containers being handled by Ansible (or possibly Terraform). 
 
-#### Lab Topology
+### Lab Topology
 
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology.jpg?raw=true)
 
-#### Kubernetes Architecture
+### Kubernetes Architecture
 
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/img/kubernetes_architecture.jpg?raw=true)
 
-## Containers
+## Container List
 The following containers are deployed with the Kebernetes cluster environment
 
 - Apache Guacamole (web remote access)
@@ -29,7 +29,7 @@ The following containers are deployed with the Kebernetes cluster environment
 - Python Cloud Phone (pending)
 - HTTPS Proxy (pending)
 
-## Virtual Machines
+## Virtual Machine List
 The following virtual machines are deployed within Proxmox
 
 - Windows 10
