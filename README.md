@@ -5,6 +5,13 @@ The lab environment is intended to run under a configuration-as-code model, with
 
 ### Lab Topology
 
+The lab environment is contained entirely within a single Intel NUC running Proxmox as hypervisor with the below specs. 
+The hypervisor environment holds two kubernetes clusters, and a number of virtual machines.
+
+- Core i5 8259U (4 core, 8 thread)
+- 32GB DDR4 RAM (2400Mhz)
+- 512 GB NVME SSD (Samsung)
+
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology.jpg?raw=true)
 
 ### Kubernetes Architecture
