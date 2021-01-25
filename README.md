@@ -42,7 +42,7 @@ The following containers are deployed with the Kebernetes cluster environment
 - VSCode Server (Visual Studio Code in the browser)
 - Nginx (static sites)
 - Ansible (configuration management)
-- Grafana (logging dashboard)
+- Zabbix (monitoring server)
 - Python Dynamic DNS Script (update DNS if ISP changes IP)
 - OpenWRT (WiFi Router OS)
 - BlueberryFi (OpenWRT testbed UI)
@@ -53,7 +53,7 @@ The following containers are deployed with the Kebernetes cluster environment
 The following virtual machines are deployed within Proxmox
 
 - Windows 10
-- Ubuntu Desktop
 - Fedora Workstation
+- pfSense
 - Open Air Interface (4G/5G Core Network Testbed)
 - FlexRAN (Network Slicing Testbed)
