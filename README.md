@@ -47,13 +47,12 @@ The following containers are deployed with the Kebernetes cluster environment
 - OpenWRT (WiFi Router OS)
 - BlueberryFi (OpenWRT testbed UI)
 - Python Cloud Phone (pending)
-- HTTPS Proxy (pending)
 
 ## Virtual Machine List
 The following virtual machines are deployed within Proxmox
 
-- Windows 10
-- Fedora Workstation
-- pfSense
+- Windows 10 (desktop)
+- Fedora Workstation (desktop)
+- pfSense (firewall)
 - Open Air Interface (4G/5G Core Network Testbed)
 - FlexRAN (Network Slicing Testbed)
