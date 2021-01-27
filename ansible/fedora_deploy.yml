@@ -1,1 +1,8 @@
 ---
+- name: fedora initial setup
+  hosts: fedora_workstation
+  remote_user: root
+
+  tasks:
+    - name: run fedora initial configuration script
+    ansible.builtin.script: /_scripts/workstation/fedora_custom.sh
