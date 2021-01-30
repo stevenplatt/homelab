@@ -44,6 +44,7 @@ The following containers are deployed with the Kebernetes cluster environment
 - Ansible (configuration management)
 - Zabbix (monitoring server)
 - Python Dynamic DNS Script (update DNS if ISP changes IP)
+- Tweet-Delete (auto-deleting of Twitter posts)
 - OpenWRT (WiFi Router OS)
 - BlueberryFi (OpenWRT testbed UI)
 - Python Cloud Phone (pending)
