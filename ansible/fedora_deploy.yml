@@ -1,4 +1,39 @@
 ---
+
+# performs a full configuration of a cleanly installed fedora operating system
+
+- name: install papyrus icon pack
+  hosts: fedora_workstation
+  tasks:
+    - name: enable papyrus repository
+      command: dnf copr enable dirkdavidis/papirus-icon-theme -y
+      become: true
+    - name: update dnf cache
+      command: dnf update -y
+      become: true
+    - name: install papyrus icons
+      command: dnf install -y papirus-icon-theme
+      become: true
+
+- name: install flatpak applications
+  hosts: fedora_workstation
+  tasks:
+    - name: Enable Flathub repository
+      command: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+      become: true
+    - name: application installs
+      # placing the command in quotes is required if a variable is at the start of the command
+      command: flatpak install --assumeyes flathub {{ flatpak }}
+      become: true
+        flatpak:
+          - com.skype.Client
+          - com.visualstudio.code
+          - us.zoom.Zoom
+          - com.valvesoftware.Steam
+          - com.discordapp.Discord
+          - com.elsevier.MendeleyDesktop
+          - com.obsproject.Studio
+
 - name: fedora initial setup
   hosts: fedora_workstation
   become: true
@@ -25,16 +60,6 @@
       - krita
       - xournal
     state: present
-    
-- name: remove unused packages
-  hosts: fedora_workstation
-  become: true
-  yum:
-    name:
-      - rhythmbox
-      - gnome-contacts
-      - gnome-maps
-    state: absent
 
 # automatically uses installed python version (pyhton3)
 - name: install python pip3 package
@@ -47,24 +72,16 @@
       - notebook
       - twine
     state: present 
-
-- name: install flatpak applications
+    
+- name: remove unused packages
   hosts: fedora_workstation
-  tasks:
-    - name: Enable Flathub repository
-      command: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-      become: yes
-    - name: application installs
-      command: flatpak install --assumeyes flathub {{ flatpak }}
-      become: yes
-        flatpak:
-          - com.skype.Client
-          - com.visualstudio.code
-          - us.zoom.Zoom
-          - com.valvesoftware.Steam
-          - com.discordapp.Discord
-          - com.elsevier.MendeleyDesktop
-          - com.obsproject.Studio
+  become: true
+  yum:
+    name:
+      - rhythmbox
+      - gnome-contacts
+      - gnome-maps
+    state: absent
     
 - name: upgrade all yum-installed packages
   hosts: fedora_workstation
