@@ -1,7 +1,7 @@
 ---
 - name: fedora initial setup
   hosts: fedora_workstation
-  remote_user: root
+  become: true
   yum:
     name:
       - transmission
@@ -20,11 +20,15 @@
       - neofetch
       - tlp
       - ansible
+      - gimp
+      - inkscape
+      - krita
+      - xournal
     state: present
     
 - name: remove unused packages
   hosts: fedora_workstation
-  remote_user: root
+  become: true
   yum:
     name:
       - rhythmbox
@@ -43,10 +47,28 @@
       - notebook
       - twine
     state: present 
+
+- name: install flatpak applications
+  hosts: fedora_workstation
+  tasks:
+    - name: Enable Flathub repository
+      command: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+      become: yes
+    - name: application installs
+      command: flatpak install --assumeyes flathub {{ flatpak }}
+      become: yes
+        flatpak:
+          - com.skype.Client
+          - com.visualstudio.code
+          - us.zoom.Zoom
+          - com.valvesoftware.Steam
+          - com.discordapp.Discord
+          - com.elsevier.MendeleyDesktop
+          - com.obsproject.Studio
     
 - name: upgrade all yum-installed packages
   hosts: fedora_workstation
-  remote_user: root
+  become: true
   yum:
     name: '*'
     state: latest
