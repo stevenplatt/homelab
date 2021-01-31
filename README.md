@@ -1,7 +1,7 @@
 # homelab (under construction)
 This repository holds configurations and documentation of my home lab and wireless testbed. 
 
-The lab environment is intended to run under a infrastructure-as-code model, with all configuration of both virtual machines and containers being handled by Ansible (or possibly Terraform). Visit the Wiki of this repository for more detailed information of how to run the configuration scripts to recreate this environment. 
+The lab environment is intended to run under a infrastructure-as-code model, with all configuration of both virtual machines and containers being handled by Ansible. 
 
 ### Lab Overview
 
