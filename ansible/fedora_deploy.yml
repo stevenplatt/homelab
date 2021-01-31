@@ -31,6 +31,18 @@
       - gnome-contacts
       - gnome-maps
     state: absent
+
+# automatically uses installed python version (pyhton3)
+- name: install python pip3 package
+  pip:
+    name:
+      - flask
+      - flask-sqlalchemy
+      - flask-login
+      - jupyterlab
+      - notebook
+      - twine
+    state: present 
     
 - name: upgrade all yum-installed packages
   hosts: fedora_workstation
