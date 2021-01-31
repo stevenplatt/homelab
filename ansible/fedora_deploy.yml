@@ -2,7 +2,39 @@
 - name: fedora initial setup
   hosts: fedora_workstation
   remote_user: root
-
-  tasks:
-    - name: run fedora initial configuration script
-    ansible.builtin.script: /_scripts/workstation/fedora_custom.sh
+  yum:
+    name:
+      - transmission
+      - gnome-tweaks
+      - dnf-plugins-core
+      - cmatrix
+      - liveusb-creator
+      - numix-icon-theme-circle
+      - npm
+      - pygtk2
+      - wireshark
+      - nmap
+      - unar
+      - python-virtualenv
+      - python3-flask
+      - neofetch
+      - tlp
+      - ansible
+    state: present
+    
+- name: remove unused packages
+  hosts: fedora_workstation
+  remote_user: root
+  yum:
+    name:
+      - rhythmbox
+      - gnome-contacts
+      - gnome-maps
+    state: absent
+    
+- name: upgrade all yum-installed packages
+  hosts: fedora_workstation
+  remote_user: root
+  yum:
+    name: '*'
+    state: latest
