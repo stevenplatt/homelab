@@ -2,6 +2,16 @@
 
 # performs a full configuration of a cleanly installed fedora operating system
 
+- name: enable rpm fusion repositories
+  hosts: fedora_workstation
+  tasks:
+    - name: enable rpm fusion free repository
+      command: dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm -y
+      become: true
+    - name: enable rpm fusion non-free repository
+      command: dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
+      become: true
+
 - name: install papyrus icon pack
   hosts: fedora_workstation
   tasks:
@@ -34,7 +44,7 @@
           - com.elsevier.MendeleyDesktop
           - com.obsproject.Studio
 
-- name: fedora initial setup
+- name: install yum applications
   hosts: fedora_workstation
   become: true
   yum:
@@ -59,6 +69,8 @@
       - inkscape
       - krita
       - xournal
+      - ffmpeg
+      - ffmpeg-devel
     state: present
 
 # automatically uses installed python version (pyhton3)
