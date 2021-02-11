@@ -1,9 +1,22 @@
-# homelab (under construction)
+# Homelab Research Testbed (under construction)
 This repository holds configurations and documentation of my home lab and wireless testbed. 
 
 The lab environment is intended to run under a infrastructure-as-code model, with all configuration of both virtual machines and containers being handled by Ansible. 
 
-### Lab Overview
+Table of contents
+=================
+
+<!--ts-->
+   * [Lab Environment](#lab-environment)
+      * [Kubernetes Architecture](#kubernetes-architecture)
+      * [Container List](#container-list)
+      * [Virtual Machine List](#virtual-machine-list)
+   * [Configuring Proxmox](#configuring-proxmox)
+<!--te-->
+
+
+Lab Environment
+============
 
 The lab environment is contained entirely within a single Intel NUC running Proxmox as hypervisor with the below specs: 
 
@@ -15,7 +28,8 @@ The hypervisor environment holds two kubernetes clusters, and a number of virtua
 
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology.jpg?raw=true)
 
-### Kubernetes Architecture
+Kubernetes Architecture
+============
 
 The kubernetes clusters within the environment are each deployed using Rancher variants of the below components: 
 
@@ -31,7 +45,9 @@ A number of components are required to sit outside of the Kubernetes cluster for
 
 The environment does not include any observability tools, such as Istio or Apache Skywalker, since most of the services run as single containers and are not networks or accessing other resources. This may change in the future. 
 
-## Container List
+Container List
+============
+
 The following containers are deployed with the Kebernetes cluster environment
 
 - Apache Guacamole (web remote access)
@@ -49,7 +65,9 @@ The following containers are deployed with the Kebernetes cluster environment
 - BlueberryFi (OpenWRT testbed UI)
 - Python Cloud Phone (pending)
 
-## Virtual Machine List
+Virtual Machine List
+============
+
 The following virtual machines are deployed within Proxmox
 
 - Windows 10 (desktop)
@@ -57,3 +75,6 @@ The following virtual machines are deployed within Proxmox
 - pfSense (firewall)
 - Open Air Interface (4G/5G Core Network Testbed)
 - FlexRAN (Network Slicing Testbed)
+
+Configuring Proxmox
+============
