@@ -11,7 +11,7 @@ Table of contents
       * [Kubernetes Architecture](#kubernetes-architecture)
       * [Container List](#container-list)
       * [Virtual Machine List](#virtual-machine-list)
-   * [Configuring Proxmox](#configuring-proxmox)
+   * [Configuration Wiki](https://github.com/stevenplatt/homelab/wiki)
 <!--te-->
 
 
@@ -75,6 +75,3 @@ The following virtual machines are deployed within Proxmox
 - pfSense (firewall)
 - Open Air Interface (4G/5G Core Network Testbed)
 - FlexRAN (Network Slicing Testbed)
-
-Configuring Proxmox
-============
