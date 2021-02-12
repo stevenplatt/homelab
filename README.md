@@ -11,7 +11,7 @@ Table of contents
       * [Kubernetes Architecture](#kubernetes-architecture)
       * [Container List](#container-list)
       * [Virtual Machine List](#virtual-machine-list)
-   * [Documentation Wiki](#documentation-wiki)
+   * [Simple Setup Wiki](#simple-setup-wiki)
 <!--te-->
 
 
@@ -76,7 +76,7 @@ The following virtual machines are deployed within Proxmox
 - Open Air Interface (4G/5G Core Network Testbed)
 - FlexRAN (Network Slicing Testbed)
 
-Documentation Wiki
+Simple Setup Wiki
 ============
 
-Complete information for setting up the virtual machines within the testbed and deploying containerized experiments and services can be found in this repos' [Documentation Wiki](https://github.com/stevenplatt/homelab/wiki).
+Complete information for setting up the virtual machines within the testbed and deploying containerized experiments and services can be found in this repos' [Wiki](https://github.com/stevenplatt/homelab/wiki).
