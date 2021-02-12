@@ -11,7 +11,7 @@ Table of contents
       * [Kubernetes Architecture](#kubernetes-architecture)
       * [Container List](#container-list)
       * [Virtual Machine List](#virtual-machine-list)
-   * [Configuration Wiki](https://github.com/stevenplatt/homelab/wiki)
+   * [Documentation Wiki](https://github.com/stevenplatt/homelab/wiki)
 <!--te-->
 
 
