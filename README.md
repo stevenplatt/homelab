@@ -7,15 +7,15 @@ Table of contents
 =================
 
 <!--ts-->
-   * [Lab Environment](#lab-environment)
+   * [Testbed Environment](#testbed-environment)
       * [Kubernetes Architecture](#kubernetes-architecture)
       * [Container List](#container-list)
       * [Virtual Machine List](#virtual-machine-list)
-   * [Simple Setup Wiki](#simple-setup-wiki)
+   * [Deployment Wiki](#deployment-wiki)
 <!--te-->
 
 
-Lab Environment
+Testbed Environment
 ============
 
 The lab environment is contained entirely within a single Intel NUC running Proxmox as hypervisor with the below specs: 
@@ -76,7 +76,7 @@ The following virtual machines are deployed within Proxmox
 - Open Air Interface (4G/5G Core Network Testbed)
 - FlexRAN (Network Slicing Testbed)
 
-Simple Setup Wiki
+Deployment Wiki
 ============
 
-Complete information for setting up the virtual machines within the testbed and deploying containerized experiments and services can be found in this repos' [Wiki](https://github.com/stevenplatt/homelab/wiki).
+Complete information for setting up the virtual machines within the testbed and deploying containerized experiments and services can be found in this repos' [Deployment Wiki](https://github.com/stevenplatt/homelab/wiki).
