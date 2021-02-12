@@ -1,5 +1,5 @@
 # Homelab Research Testbed (under construction)
-This repository holds configurations and documentation for "homelab", a wireless research testbed. 
+This repository holds configurations and documentation for deploying a datacenter-in-a-box for network research experiments.  
 
 The lab environment is intended to run under a infrastructure-as-code model, with all configuration of both virtual machines and containers being handled by Ansible. 
 
