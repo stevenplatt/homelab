@@ -8,10 +8,9 @@ Table of contents
 
 <!--ts-->
    * [Testbed Environment](#testbed-environment)
-      * [Kubernetes Architecture](#kubernetes-architecture)
       * [Container List](#container-list)
       * [Virtual Machine List](#virtual-machine-list)
-   * [Deployment Wiki](#deployment-wiki)
+   * [Deployment Instructions](#deployment-instructions)
 <!--te-->
 
 
@@ -38,14 +37,8 @@ The following containers are deployed with the Kebernetes cluster environment
 - OpenVPN (vpn)
 - Librespeed (speed test)
 - VSCode Server (Visual Studio Code in the browser)
-- Nginx (static sites)
 - Ansible (configuration management)
-- Zabbix (monitoring server)
-- Python Dynamic DNS Script (update DNS if ISP changes IP)
-- Tweet-Delete (auto-deleting of Twitter posts)
 - OpenWRT (WiFi Router OS)
-- BlueberryFi (OpenWRT testbed UI)
-- Python Cloud Phone (pending)
 
 Virtual Machine List
 ============
@@ -61,4 +54,4 @@ The following virtual machines are deployed within Proxmox
 Deployment Instructions
 ============
 
-Complete information for setting up the virtual machines within the testbed and deploying containerized experiments and services can be found in this repos' [Deployment Wiki](https://github.com/stevenplatt/homelab/wiki).
+
