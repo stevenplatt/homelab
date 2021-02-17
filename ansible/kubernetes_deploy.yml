@@ -1,6 +1,0 @@
----
-  - name: "deploy redundant kubernetes clusters"
-    hosts: hypervisor
-
-    tasks: 
-      - name: "create virtual machines"

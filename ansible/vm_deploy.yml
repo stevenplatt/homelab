@@ -1,3 +1,0 @@
----
-# this playbook holds configuration for downloading and deploying virtual machines images to the proxmox environment.
-# operating system images are stored in the cloud, withou object storage from provider Digital Ocean. 
