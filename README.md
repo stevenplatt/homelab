@@ -26,7 +26,7 @@ The lab environment is contained entirely within a single Intel NUC running Prox
 
 The hypervisor environment holds two kubernetes clusters, and a number of virtual machines.
 
-![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology_simple1.png?raw=true)
+![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology_v3.png?raw=true)
 
 Container List
 ============
@@ -58,7 +58,7 @@ The following virtual machines are deployed within Proxmox
 - Ubuntu Server / FlexRAN (Network Slicing Testbed)
 - Ubuntu Desktop
 
-Deployment Wiki
+Deployment Instructions
 ============
 
 Complete information for setting up the virtual machines within the testbed and deploying containerized experiments and services can be found in this repos' [Deployment Wiki](https://github.com/stevenplatt/homelab/wiki).
