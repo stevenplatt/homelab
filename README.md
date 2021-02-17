@@ -25,7 +25,7 @@ The lab environment is contained entirely within a single Intel NUC running Prox
 
 The hypervisor environment holds two kubernetes clusters, and a number of virtual machines.
 
-![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology_v3.png?raw=true)
+![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology_v4.png?raw=true)
 
 Container List
 ============
