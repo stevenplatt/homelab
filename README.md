@@ -25,7 +25,7 @@ The lab environment is contained entirely within a single Intel NUC running Prox
 
 The hypervisor environment holds two kubernetes clusters, and a number of virtual machines.
 
-![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology_v4.png?raw=true)
+![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology_v3.png?raw=true)
 
 Container List
 ============
@@ -65,6 +65,4 @@ To deploy the Proxmox testbed environment, the following ISO images will be need
 
 3. PfSense Firewall: `wget https://nyifiles.netgate.com/mirror/downloads/pfSense-CE-2.5.0-RELEASE-amd64.iso.gz`
 
-## Create an Ubuntu Server Template Using Cloud-Init
-
-Virtual machines within the Kubernetes clusters all run Ubuntu Server 20.04 LTS. Creating a machine template for this allow fast cloning to add additional virtual machine nodes to the Kubernetes cluster. Cloud-Init is used to create the image, as this accommodates adding a ssh public key that can be used later by Ansible for customizing the virtual machine for a specific role. 
+...
