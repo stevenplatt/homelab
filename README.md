@@ -1,23 +1,22 @@
 # BlueberryFi Research Testbed (under construction)
-This repository holds configurations and documentation for deploying a general purpose datacenter-in-a-box for network research experiments.  
 
-The lab environment is intended to run under a infrastructure-as-code model, with all configuration of both virtual machines and containers being handled by Ansible. 
+This repository holds configurations and documentation for deploying a general purpose datacenter-in-a-box for network research experiments.
 
-Table of contents
-=================
+The lab environment is intended to run under a infrastructure-as-code model, with all configuration of both virtual machines and containers being handled by Ansible.
+
+# Table of contents
 
 <!--ts-->
-   * [Testbed Environment](#testbed-environment)
-      * [Container List](#container-list)
-      * [Virtual Machine List](#virtual-machine-list)
-   * [Deployment Instructions](#deployment-instructions)
+
+- [Testbed Environment](#testbed-environment)
+  - [Container List](#container-list)
+  - [Virtual Machine List](#virtual-machine-list)
+- [Deployment Instructions](#deployment-instructions)
 <!--te-->
 
+# Testbed Environment
 
-Testbed Environment
-============
-
-The lab environment is contained entirely within a single Intel NUC running Proxmox as hypervisor with the below specs: 
+The lab environment is contained entirely within a single Intel NUC running Proxmox as hypervisor with the below specs:
 
 - Core i5 8259U (4 core, 8 thread)
 - 32GB DDR4 RAM (2400Mhz)
@@ -27,11 +26,11 @@ The hypervisor environment holds two kubernetes clusters, and a number of virtua
 
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology_v3.png?raw=true)
 
-Container List
-============
+# Container List
 
 The following containers are deployed with the Kebernetes cluster environment
 
+- Apache Guacamole (Remote Desktop)
 - NextCloud (Google Apps substitue)
 - PiHole (ad blocking)
 - OpenVPN (vpn)
@@ -40,8 +39,7 @@ The following containers are deployed with the Kebernetes cluster environment
 - Ansible (configuration management)
 - OpenWRT (WiFi Router OS)
 
-Virtual Machine List
-============
+# Virtual Machine List
 
 The following virtual machines are deployed within Proxmox
 
@@ -51,13 +49,13 @@ The following virtual machines are deployed within Proxmox
 - Ubuntu Server / FlexRAN (Network Slicing Testbed)
 - Ubuntu Desktop
 
-Deployment Instructions
-============
+# Deployment Instructions
 
-This guide assumes that a base image of Proxmox is already installed. Instructions for initial installation can be found on the [Proxmox website](https://pve.proxmox.com/wiki/Installation). 
+This guide assumes that a base image of Proxmox is already installed. Instructions for initial installation can be found on the [Proxmox website](https://pve.proxmox.com/wiki/Installation).
 
 ## Download Required ISO Images
-To deploy the Proxmox testbed environment, the following ISO images will be needed, and can be downloaded to Proxmox local storage using the commands below. 
+
+To deploy the Proxmox testbed environment, the following ISO images will be needed, and can be downloaded to Proxmox local storage using the commands below.
 
 1. Ubuntu Desktop 20.04 LTS: `wget https://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso`
 
