@@ -46,6 +46,8 @@ function get_token(){
 function forward_webui(){
     # forward kubernetes web ui at port 443 to the virtual machine IP at port 10443 for outside access
     # "microk8s kubectl" format is required for the command, nohup command seems to ignore the kubectl bash alias
+    # starting microk8s and port forward will be added as autostart in future update
+    # see comment at end of script
     nohup microk8s kubectl port-forward -n kube-system service/kubernetes-dashboard --address=0.0.0.0 10443:443 &>/dev/null & disown
     echo "\n"
     echo "Kubernetes is online and can be accessed at https://[server_ip]:10443"
@@ -62,5 +64,5 @@ install_addons
 get_token
 forward_webui
 
-# copy and paste the token that is printed. 
-# this token is used to log into the web ui.
+# if system is rebooted, microk8s has to be started using command "sudo systemctl restart snap.microk8s.daemon-containerd.service"
+# afterwards port forward must also be reissued with command "nohup microk8s kubectl port-forward -n kube-system service/kubernetes-dashboard --address=0.0.0.0 10443:443 &>/dev/null & disown"
