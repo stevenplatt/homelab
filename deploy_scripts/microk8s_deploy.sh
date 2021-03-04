@@ -66,3 +66,4 @@ forward_webui
 
 # if system is rebooted, microk8s has to be started using command "sudo systemctl restart snap.microk8s.daemon-containerd.service"
 # afterwards port forward must also be reissued with command "nohup microk8s kubectl port-forward -n kube-system service/kubernetes-dashboard --address=0.0.0.0 10443:443 &>/dev/null & disown"
+# https://microk8s.io/docs/configuring-services
