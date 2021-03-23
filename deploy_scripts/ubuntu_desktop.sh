@@ -55,7 +55,7 @@ snap_apps(){
     sudo snap install skype
     sudo snap install code --classic
     sudo snap install inkscape
-    sudo snap install krita
+    # sudo snap install krita # removed due to lack of pen input
     sudo snap install gimp
     sudo snap install discord && sudo snap connect discord:system-observe
     sudo snap install kubectl --classic
