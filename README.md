@@ -1,4 +1,4 @@
-# BlueberryFi Research Testbed (under construction)
+# Research Testbed (under construction)
 
 This repository holds configurations and documentation for deploying a general purpose datacenter-in-a-box for network research experiments.
 
