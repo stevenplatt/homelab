@@ -2,7 +2,7 @@
 # this script is most recently tested with Pop OS 20.10
 
 # enable third party repositories 
-repositories(){
+update_repositories(){
     sudo apt install -y flatpak
     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
@@ -22,15 +22,11 @@ ubuntu_apps(){
     sudo apt install -y gnome-boxes
     sudo apt install -y gnome-sushi
     sudo apt install -y transmission
-    sudo apt install -y krita
-    sudo apt install -y fritzing
     sudo apt install -y neofetch
     sudo apt install -y numix-icon-theme-circle 
     sudo apt install -y python-virtualenv
     sudo apt install -y tlp
     sudo apt install -y pygtk2
-    sudo apt install -y nmap
-    sudo apt install -y wireshark
     sudo apt install -y balena-etcher-electron
 }
 
@@ -48,15 +44,52 @@ python_apps(){
 flatpak_apps(){
     sudo flatpak install -y flathub com.elsevier.MendeleyDesktop 
     sudo flatpak install -y flathub org.filezillaproject.Filezilla 
-    sudo flatpak install -y flathub com.obsproject.Studio 
-    sudo flatpak install -y flathub com.skype.Client
-    sudo flatpak install -y flathub com.visualstudio.code 
     sudo flatpak install -y flathub us.zoom.Zoom 
-    sudo flatpak install -y flathub com.valvesoftware.Steam 
-    sudo flatpak install -y flathub org.inkscape.Inkscape 
-    sudo flatpak install -y flathub org.gimp.GIMP 
-    sudo flatpak install -y flathub com.github.xournalpp.xournalpp 
-    sudo flatpak install -y flathub com.discordapp.Discord
+    sudo flatpak install -y flathub com.valvesoftware.Steam
+}
+
+# install snap apps
+snap_apps(){
+    sudo snap install chromium 
+    sudo snap install gitkraken --classic
+    sudo snap install skype
+    sudo snap install code --classic
+    sudo snap install inkscape
+    sudo snap install krita
+    sudo snap install gimp
+    sudo snap install discord && snap connect discord:system-observe
+    sudo snap install kubectl --classic
+}
+
+# install obs studio
+obs_install(){
+    # source instruction: https://snapcraft.io/obs-studio
+    sudo snap install obs-studio
+    
+    # connect media interfaces
+    sudo snap connect obs-studio:alsa
+    sudo snap connect obs-studio:audio-record
+    sudo snap connect obs-studio:avahi-control
+    sudo snap connect obs-studio:camera
+    sudo snap connect obs-studio:jack1
+    sudo snap connect obs-studio:kernel-module-observe
+    
+    # enable virtual camera support
+    sudo snap connect obs-studio:kernel-module-observe
+    sudo apt -y install v4l2loopback-dkms v4l2loopback-utils
+    echo "options v4l2loopback devices=1 video_nr=13 card_label='OBS Virtual Camera'    exclusive_caps=1" | sudo tee /etc/modprobe.d/v4l2loopback.conf
+    echo "v4l2loopback" | sudo tee /etc/modules-load.d/v4l2loopback.conf
+    sudo modprobe -r v4l2loopback
+    sudo modprobe v4l2loopback devices=1 video_nr=13 card_label='OBS Virtual Camera' exclusive_caps=1
+    
+    # enable removable media support
+    snap connect obs-studio:removable-media
+    
+    # allow usb dslr support
+    snap connect obs-studio:raw-usb
+    
+    # allow input overlay support
+    snap connect obs-studio:joystick
 }
 
 # install 3rd Party Applications
@@ -94,33 +127,40 @@ upgrade_OS(){
 printf "\n\nLoading system customizations...\n"
 printf "This process may take up to 30 minutes, depending on network speed.\n\n"
 
-repositories &>> installation.log
+update_repositories
 
 ######### Install store applications #########
 printf "\n\n(Step 1 of 5): Installing Store applications\n"
 
-ubuntu_apps &>> installation.log
-python_apps &>> installation.log
+ubuntu_apps 
+python_apps 
 
 ######### Install flatpak applications #########
 printf "(Step 2 of 5): Installing Flatpak applications\n"
 
-flatpak_apps &>> installation.log
+flatpak_apps 
+
+######### Install snap applications #########
+printf "(Step 3 of 5): Installing Snap applications\n"
+
+snap_apps
+obs_install
 
 ######### install non-standard repository applications #########
-printf "(Step 3 of 5): Installing non-standard repository applications\n"
+# printf "(Step 3 of 5): Installing non-standard repository applications\n"
 
-external_apps &>> installation.log
+# external_apps &>> installation.log
 
 ######### Purge preinstalled Ubuntu applications #########
 printf "(Step 4 of 5): Purging preinstalled applications\n"
 
-remove_apps &>> installation.log
+remove_apps
 
 ######### Upgrade system and applications, then reboot #########
 printf "(Step 5 of 5): Upgrading Ubuntu base distribution image\n"
-upgrade_OS &>> installation.log
+upgrade_OS 
 
 printf "\nUpdate complete. Rebooting system...\n\n"
 sudo reboot
 
+# send terminal output to log using "&>> installation.log". For example "upgrade_OS &>> installation.log"
