@@ -1,5 +1,5 @@
 #!/bin/sh
-# this script is most recently tested with Pop OS 20.10
+# this script is most recently tested with Ubuntu 20.04 LTS
 
 # enable third party repositories 
 update_repositories(){
