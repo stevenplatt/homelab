@@ -46,6 +46,8 @@ flatpak_apps(){
     sudo flatpak install -y flathub org.filezillaproject.Filezilla 
     sudo flatpak install -y flathub us.zoom.Zoom 
     sudo flatpak install -y flathub com.valvesoftware.Steam
+    sudo flatpak install -y flathub com.rawtherapee.RawTherapee
+    sudo flatpak install -y flathub org.gnome.Shotwell
 }
 
 # install snap apps
