@@ -57,7 +57,7 @@ snap_apps(){
     sudo snap install inkscape
     sudo snap install krita
     sudo snap install gimp
-    sudo snap install discord && snap connect discord:system-observe
+    sudo snap install discord && sudo snap connect discord:system-observe
     sudo snap install kubectl --classic
 }
 
