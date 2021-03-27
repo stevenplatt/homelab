@@ -14,6 +14,7 @@ update_repositories(){
 }
 
 ubuntu_apps(){
+    sudo apt install -y snapd
     sudo apt install -y apt-transport-https 
     sudo apt install -y gnome-tweaks
     sudo apt install -y cmatrix
@@ -23,10 +24,8 @@ ubuntu_apps(){
     sudo apt install -y gnome-sushi
     sudo apt install -y transmission
     sudo apt install -y neofetch
-    sudo apt install -y numix-icon-theme-circle 
-    sudo apt install -y python-virtualenv
+    sudo apt install -y numix-icon-theme-circle
     sudo apt install -y tlp
-    sudo apt install -y pygtk2
     sudo apt install -y balena-etcher-electron
 }
 
