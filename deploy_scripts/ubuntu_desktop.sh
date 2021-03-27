@@ -15,6 +15,7 @@ update_repositories(){
 
 ubuntu_apps(){
     sudo apt install -y snapd
+    sudo apt install -y steam
     sudo apt install -y apt-transport-https 
     sudo apt install -y gnome-tweaks
     sudo apt install -y cmatrix
@@ -44,7 +45,6 @@ flatpak_apps(){
     sudo flatpak install -y flathub com.elsevier.MendeleyDesktop 
     sudo flatpak install -y flathub org.filezillaproject.Filezilla 
     sudo flatpak install -y flathub us.zoom.Zoom 
-    sudo flatpak install -y flathub com.valvesoftware.Steam
     sudo flatpak install -y flathub com.rawtherapee.RawTherapee
     sudo flatpak install -y flathub org.gnome.Shotwell
 }
