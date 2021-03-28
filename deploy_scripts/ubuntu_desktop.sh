@@ -110,8 +110,8 @@ external_apps(){
     
     # install mendeley
     wget https://www.mendeley.com/repositories/ubuntu/stable/amd64/mendeleydesktop-latest
-    sudo apt install -y ./mendeley*
-    rm ./mendeley*
+    sudo apt install -y ./mendeleydesktop-latest*
+    rm ./mendeleydesktop-latest*
 }
 
 # remove preinstalled apps
