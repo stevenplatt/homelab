@@ -42,7 +42,7 @@ python_apps(){
 
 # install flatpak apps
 flatpak_apps(){
-    sudo flatpak install -y flathub com.elsevier.MendeleyDesktop 
+    # sudo flatpak install -y flathub com.elsevier.MendeleyDesktop 
     sudo flatpak install -y flathub org.filezillaproject.Filezilla 
     sudo flatpak install -y flathub us.zoom.Zoom 
     sudo flatpak install -y flathub com.rawtherapee.RawTherapee
@@ -107,6 +107,11 @@ external_apps(){
 
     # install Papyrus icon theme
     sudo wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install.sh | sh
+    
+    # install mendeley
+    wget https://www.mendeley.com/repositories/ubuntu/stable/amd64/mendeleydesktop-latest
+    sudo apt install -y ./mendeley*
+    rm ./mendeley*
 }
 
 # remove preinstalled apps
