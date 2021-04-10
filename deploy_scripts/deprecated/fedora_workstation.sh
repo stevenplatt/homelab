@@ -20,7 +20,6 @@ fedora_apps(){
     sudo dnf install -y papirus-icon-theme 
     sudo dnf install -y npm
     sudo dnf install -y pygtk2
-    sudo dnf install -y wireshark 
     sudo dnf install -y nmap 
     sudo dnf install -y unar 
     sudo dnf install -y python3-flask 
@@ -55,6 +54,14 @@ flatpak_apps(){
     sudo flatpak install -y flathub com.discordapp.Discord
 }
 
+# install external apps
+external_apps(){
+    # install Google Chrome
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+    sudo dnf install -y ./google-chrome-stable_current_x86_64.rpm
+    rm ./google-chrome-stable_current_x86_64.rpm
+}
+
 # remove preinstalled apps
 remove_apps(){
     sudo dnf remove -y rhythmbox* 
@@ -71,15 +78,16 @@ repositories &>> installation.log
 
 printf "\n\n(Step 1 of 3): Installing Fedora applications\n"
 
-fedora_apps &>> installation.log
-python_apps &>> installation.log
+fedora_apps &> installation.log
+python_apps &> installation.log
+external_apps &> installation.log
 
 printf "(Step 2 of 3): Installing Flatpak applications\n"
 
-flatpak_apps &>> installation.log
+flatpak_apps &> installation.log
 
 printf "(Step 3 of 3): Purging preinstalled applications\n"
-remove_apps &>> installation.log
+remove_apps &> installation.log
 
 printf "\nUpdate complete. Rebooting system...\n\n"
 sudo reboot
