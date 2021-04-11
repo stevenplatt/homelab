@@ -27,6 +27,8 @@ ubuntu_apps(){
     sudo apt install -y neofetch
     sudo apt install -y numix-icon-theme-circle
     sudo apt install -y tlp
+    sudo apt install -y kdenlive # installed from ubuntu repo for better compatibility
+    sudo apt install -y obs-studio # installed from ubuntu repo for better compatibility
     sudo apt install -y balena-etcher-electron
 }
 
@@ -42,23 +44,20 @@ python_apps(){
 
 # install flatpak apps
 flatpak_apps(){
-    # sudo flatpak install -y flathub com.elsevier.MendeleyDesktop 
     sudo flatpak install -y flathub org.filezillaproject.Filezilla 
     sudo flatpak install -y flathub us.zoom.Zoom 
     sudo flatpak install -y flathub com.rawtherapee.RawTherapee
     sudo flatpak install -y flathub org.gnome.Shotwell
+    sudo flatpak install -y flathub com.elsevier.MendeleyDesktop
+    sudo flatpak install -y flathub com.skype.Client
+    sudo flatpak install -y flathub com.visualstudio.code
+    sudo flatpak install -y flathub org.inkscape.Inkscape
+    sudo flatpak install -y flathub org.gimp.GIMP
+    sudo flatpak install -y flathub com.discordapp.Discord
 }
 
 # install snap apps
 snap_apps(){
-    sudo snap install chromium 
-    sudo snap install gitkraken --classic
-    sudo snap install skype
-    sudo snap install code --classic
-    sudo snap install inkscape
-    # sudo snap install krita # removed due to lack of pen input
-    sudo snap install gimp
-    # sudo snap install discord && sudo snap connect discord:system-observe
     sudo snap install kubectl --classic
 }
 
@@ -101,17 +100,12 @@ external_apps(){
     rm ./google-chrome-stable_current_amd64.deb
 
     # install TeamViewer
-    wget https://download.teamviewer.com/download/linux/teamviewer_amd64.deb
-    sudo apt install -y ./teamviewer_amd64.deb
-    rm ./teamviewer_amd64.deb
+    # wget https://download.teamviewer.com/download/linux/teamviewer_amd64.deb
+    # sudo apt install -y ./teamviewer_amd64.deb
+    # rm ./teamviewer_amd64.deb
 
     # install Papyrus icon theme
     sudo wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install.sh | sh
-    
-    # install mendeley
-    wget https://www.mendeley.com/repositories/ubuntu/stable/amd64/mendeleydesktop-latest
-    sudo apt install -y ./mendeleydesktop-latest*
-    rm ./mendeleydesktop-latest*
 }
 
 # remove preinstalled apps
@@ -120,6 +114,7 @@ remove_apps(){
     sudo apt-get purge --auto-remove -y rhythmbox* 
     sudo apt-get purge --auto-remove -y gnome-contacts* 
     sudo apt-get purge --auto-remove -y gnome-maps
+    sudo apt-get purge --auto-remove -y firefox*
 }
 
 # upgrade Ubuntu OS
@@ -139,7 +134,7 @@ update_repositories
 printf "\n\n(Step 1 of 5): Installing Store applications\n"
 
 ubuntu_apps 
-python_apps 
+# python_apps 
 
 ######### Install flatpak applications #########
 printf "(Step 2 of 5): Installing Flatpak applications\n"
@@ -150,7 +145,7 @@ flatpak_apps
 printf "(Step 3 of 5): Installing Snap applications\n"
 
 snap_apps
-obs_install
+# obs_install
 
 ######### install non-standard repository applications #########
 # printf "(Step 3 of 5): Installing non-standard repository applications\n"
