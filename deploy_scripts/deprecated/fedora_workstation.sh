@@ -3,6 +3,8 @@
 
 # enable third party repositories 
 repositories(){
+    sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm # rpmfusion free repo
+    sudo dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm # rpmfusion non-free repo
     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo 
     sudo dnf copr enable dirkdavidis/papirus-icon-theme -y 
     sudo dnf update -y 
@@ -27,6 +29,14 @@ fedora_apps(){
     sudo dnf install -y neofetch 
     sudo dnf install -y tlp
     sudo dnf install -y ansible
+    sudo dnf install -y pitivi
+    }
+    
+# install multimedia codecs from rpmfusio (required for pitivi and certain video playback)
+multimedia_apps(){
+    sudo dnf install -y gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel
+    sudo dnf install -y lame\* --exclude=lame-devel
+    sudo dnf group upgrade -y --with-optional Multimedia
     }
 
 # install dependencies for running flask web apps
@@ -79,6 +89,7 @@ repositories &>> installation.log
 printf "\n\n(Step 1 of 3): Installing Fedora applications\n"
 
 fedora_apps &> installation.log
+multimedia_apps &> installation.log
 python_apps &> installation.log
 external_apps &> installation.log
 
