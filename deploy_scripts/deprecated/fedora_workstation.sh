@@ -33,6 +33,7 @@ fedora_apps(){
     }
     
 # install multimedia codecs from rpmfusio (required for pitivi and certain video playback)
+# https://docs.fedoraproject.org/en-US/quick-docs/assembly_installing-plugins-for-playing-movies-and-music/
 multimedia_apps(){
     sudo dnf install -y gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel
     sudo dnf install -y lame\* --exclude=lame-devel
