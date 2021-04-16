@@ -80,7 +80,8 @@ remove_apps(){
 }
 
 # disable crash reporting and alerting
-disable_alerts(){
+# https://robbinespu.gitlab.io/blog/2019/05/15/disabling-abrt-fedora/
+disable_alerts(){ 
     sudo systemctl stop abrt-journal-core.service 
     sudo systemctl disable  abrt-journal-core.service
 
