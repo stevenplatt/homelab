@@ -10,7 +10,6 @@ repositories(){
     sudo dnf update -y 
 }
 
-
 # install fedora repository utilities and apps
 fedora_apps(){
     sudo dnf install -y transmission 
@@ -80,6 +79,21 @@ remove_apps(){
     sudo dnf remove -y gnome-maps
 }
 
+# disable crash reporting and alerting
+disable_alerts(){
+    sudo systemctl stop abrt-journal-core.service 
+    sudo systemctl disable  abrt-journal-core.service
+
+    sudo systemctl stop abrt-oops.service
+    sudo systemctl disable abrt-oops.service
+
+    sudo systemctl stop abrt-xorg.service
+    sudo systemctl disable abrt-xorg.service
+
+    sudo systemctl stop abrtd.service
+    sudo systemctl disable abrtd.service
+}
+
 ######### run installation script #########
 
 printf "\n\nLoading system customizations...\n"
@@ -100,6 +114,7 @@ flatpak_apps &> installation.log
 
 printf "(Step 3 of 3): Purging preinstalled applications\n"
 remove_apps &> installation.log
+disable_alerts &> installation.log
 
 printf "\nUpdate complete. Rebooting system...\n\n"
 sudo reboot
