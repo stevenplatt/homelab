@@ -27,7 +27,7 @@ ubuntu_apps(){
     sudo apt install -y neofetch
     sudo apt install -y numix-icon-theme-circle
     sudo apt install -y tlp
-    sudo apt install -y kdenlive # installed from ubuntu repo for better compatibility
+    sudo apt install -y pitivi # installed from ubuntu repo for better compatibility
     sudo apt install -y obs-studio # installed from ubuntu repo for better compatibility
     sudo apt install -y balena-etcher-electron
 }
@@ -139,7 +139,7 @@ ubuntu_apps
 ######### Install flatpak applications #########
 printf "(Step 2 of 5): Installing Flatpak applications\n"
 
-flatpak_apps 
+# flatpak_apps 
 
 ######### Install snap applications #########
 printf "(Step 3 of 5): Installing Snap applications\n"
