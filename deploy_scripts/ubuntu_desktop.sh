@@ -30,16 +30,16 @@ ubuntu_apps(){
     sudo apt install -y pitivi # installed from ubuntu repo for better compatibility
     sudo apt install -y obs-studio # installed from ubuntu repo for better compatibility
     sudo apt install -y balena-etcher-electron
+    sudo apt install -y unrar
 }
 
 # install dependencies for running flask web apps
 python_apps(){
     sudo pip3 install flask 
     sudo pip3 install flask-sqlalchemy 
-    sudo pip3 install flask-login 
-    sudo pip3 install jupyterlab 
-    sudo pip3 install notebook
+    sudo pip3 install flask-login
     sudo pip3 install twine
+    sudo pip3 install seaborn
     }
 
 # install flatpak apps
