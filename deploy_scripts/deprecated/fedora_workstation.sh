@@ -31,7 +31,7 @@ fedora_apps(){
     sudo dnf install -y pitivi
     }
     
-# install multimedia codecs from rpmfusio (required for pitivi and certain video playback)
+# install multimedia codecs from rpmfusion (required for pitivi and certain video playback)
 # https://docs.fedoraproject.org/en-US/quick-docs/assembly_installing-plugins-for-playing-movies-and-music/
 multimedia_apps(){
     sudo dnf install -y gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel
@@ -43,9 +43,7 @@ multimedia_apps(){
 python_apps(){
     sudo pip3 install flask 
     sudo pip3 install flask-sqlalchemy 
-    sudo pip3 install flask-login 
-    sudo pip3 install jupyterlab 
-    sudo pip3 install notebook
+    sudo pip3 install flask-login
     sudo pip3 install twine
     }
 
@@ -60,7 +58,6 @@ flatpak_apps(){
     sudo flatpak install -y flathub com.valvesoftware.Steam 
     sudo flatpak install -y flathub org.inkscape.Inkscape 
     sudo flatpak install -y flathub org.gimp.GIMP 
-    sudo flatpak install -y flathub com.github.xournalpp.xournalpp 
     sudo flatpak install -y flathub com.discordapp.Discord
 }
 
