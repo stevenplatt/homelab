@@ -24,13 +24,10 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 The following containers are deployed with the Kebernetes cluster environment
 
-- Apache Guacamole (Remote Desktop)
-- NextCloud (Google Apps substitue)
 - PiHole (ad blocking)
 - OpenVPN (vpn)
 - Librespeed (speed test)
 - VSCode Server (Visual Studio Code in the browser)
-- Ansible (configuration management)
 - OpenWRT (WiFi Router OS)
 
 # Virtual Machine List
