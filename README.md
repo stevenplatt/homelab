@@ -10,7 +10,6 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 - [Testbed Environment](#testbed-environment)
   - [Container List](#container-list)
-  - [Virtual Machine List](#virtual-machine-list)
 - [Deployment Instructions](#deployment-instructions)
 <!--te-->
 
@@ -24,21 +23,15 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 The following containers are deployed with the Kebernetes cluster environment
 
+- Telecomsteve (Website)
+- ResearchEng Portfolio (Website)
 - PiHole (ad blocking)
 - OpenVPN (vpn)
 - Librespeed (speed test)
 - VSCode Server (Visual Studio Code in the browser)
 - OpenWRT (WiFi Router OS)
 
-# Virtual Machine List
-
-The following virtual machines are deployed within Proxmox
-
-- Ubuntu Server / Open Air Interface (4G/5G Core Network Testbed)
-- Ubuntu Server / FlexRAN (Network Slicing Testbed)
-- Ubuntu Desktop
-
-# YAML Deployment Instructions
+# Deployment Instructions
 
 
 ...
