@@ -2,7 +2,7 @@
 
 This repository holds configurations and documentation for deploying my personal homelab and network research tesbed.
 
-The lab environment is intended to run under a infrastructure-as-code model, with all services running as containers deployable by Ansible, Terraform, and Helm within Kubernetes.
+The lab environment is intended to run under a infrastructure-as-code model, with all services running as containers deployable by Ansible, Terraform, and Helm within Kubernetes. Currently the lab is run in the cloud within [Digital Ocean Kubernetes](https://www.digitalocean.com/products/kubernetes/). 
 
 # Table of contents
 
@@ -25,6 +25,8 @@ The following containers are deployed with the Kebernetes cluster environment
 
 - Telecomsteve (Website)
 - ResearchEng Portfolio (Website)
+- Prometheus (Monitoring)
+- Grafana (Monitoring Dashboard)
 - PiHole (ad blocking)
 - OpenVPN (vpn)
 - Librespeed (speed test)
