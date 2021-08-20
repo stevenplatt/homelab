@@ -6,10 +6,6 @@ update_repositories(){
     sudo apt install -y flatpak
     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-    # belenaEtcher: https://www.fossmint.com/etcher-usb-sd-card-bootable-image-creator-for-linux/
-    echo "deb https://deb.etcher.io stable etcher" | sudo tee /etc/apt/sources.list.d/balena-etcher.list
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61
-
     sudo apt update -y
 }
 
@@ -28,28 +24,26 @@ ubuntu_apps(){
     sudo apt install -y numix-icon-theme-circle
     sudo apt install -y tlp
     sudo apt install -y pitivi # installed from ubuntu repo for better compatibility
-    sudo apt install -y obs-studio # installed from ubuntu repo for better compatibility
-    sudo apt install -y balena-etcher-electron
     sudo apt install -y unrar
+    sudo apt install -y ansible
 }
 
 # install dependencies for running flask web apps
-python_apps(){
-    sudo pip3 install flask 
-    sudo pip3 install flask-sqlalchemy 
-    sudo pip3 install flask-login
-    sudo pip3 install twine
-    sudo pip3 install seaborn
-    }
+# python_apps(){
+#     sudo pip3 install flask 
+#     sudo pip3 install flask-sqlalchemy 
+#     sudo pip3 install flask-login
+#     sudo pip3 install twine
+#     sudo pip3 install seaborn
+#     }
 
 # install flatpak apps
 flatpak_apps(){
-    sudo flatpak install -y flathub org.filezillaproject.Filezilla 
     sudo flatpak install -y flathub us.zoom.Zoom 
     sudo flatpak install -y flathub com.rawtherapee.RawTherapee
-    sudo flatpak install -y flathub org.gnome.Shotwell
+    # sudo flatpak install -y flathub org.gnome.Shotwell
     sudo flatpak install -y flathub com.elsevier.MendeleyDesktop
-    sudo flatpak install -y flathub com.skype.Client
+    # sudo flatpak install -y flathub com.skype.Client
     sudo flatpak install -y flathub com.visualstudio.code
     sudo flatpak install -y flathub org.inkscape.Inkscape
     sudo flatpak install -y flathub org.gimp.GIMP
@@ -58,38 +52,10 @@ flatpak_apps(){
 
 # install snap apps
 snap_apps(){
-    sudo snap install kubectl --classic
-}
-
-# install obs studio
-obs_install(){
-    # source instruction: https://snapcraft.io/obs-studio
-    sudo snap install obs-studio
-    
-    # connect media interfaces
-    sudo snap connect obs-studio:alsa
-    sudo snap connect obs-studio:audio-record
-    sudo snap connect obs-studio:avahi-control
-    sudo snap connect obs-studio:camera
-    sudo snap connect obs-studio:jack1
-    sudo snap connect obs-studio:kernel-module-observe
-    
-    # enable virtual camera support
-    sudo snap connect obs-studio:kernel-module-observe
-    sudo apt -y install v4l2loopback-dkms v4l2loopback-utils
-    echo "options v4l2loopback devices=1 video_nr=13 card_label='OBS Virtual Camera'    exclusive_caps=1" | sudo tee /etc/modprobe.d/v4l2loopback.conf
-    echo "v4l2loopback" | sudo tee /etc/modules-load.d/v4l2loopback.conf
-    sudo modprobe -r v4l2loopback
-    sudo modprobe v4l2loopback devices=1 video_nr=13 card_label='OBS Virtual Camera' exclusive_caps=1
-    
-    # enable removable media support
-    snap connect obs-studio:removable-media
-    
-    # allow usb dslr support
-    snap connect obs-studio:raw-usb
-    
-    # allow input overlay support
-    snap connect obs-studio:joystick
+    sudo snap install kubectl --classic # Kubernetes CLI
+    sudo snap install doctl # Digital Ocean CLI
+    sudo snap install aws-cli --classic # AWS CLI
+    sudo snap install google-cloud-sdk --classic # Google Cloud CLI
 }
 
 # install 3rd Party Applications
@@ -99,13 +65,18 @@ external_apps(){
     sudo apt install -y ./google-chrome-stable_current_amd64.deb
     rm ./google-chrome-stable_current_amd64.deb
 
-    # install TeamViewer
-    # wget https://download.teamviewer.com/download/linux/teamviewer_amd64.deb
-    # sudo apt install -y ./teamviewer_amd64.deb
-    # rm ./teamviewer_amd64.deb
+    # belenaEtcher: https://www.fossmint.com/etcher-usb-sd-card-bootable-image-creator-for-linux/
+    echo "deb https://deb.etcher.io stable etcher" | sudo tee /etc/apt/sources.list.d/balena-etcher.list
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61
+    sudo apt update
+    sudo apt install -y balena-etcher-electron
 
     # install Papyrus icon theme
     sudo wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install.sh | sh
+
+    # install the latest version of the HELM Kubernetes Package Manager
+    # https://helm.sh/docs/intro/install/
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | sh
 }
 
 # remove preinstalled apps
@@ -128,38 +99,37 @@ upgrade_OS(){
 printf "\n\nLoading system customizations...\n"
 printf "This process may take up to 30 minutes, depending on network speed.\n\n"
 
-update_repositories
+update_repositories &>> installation.log
 
 ######### Install store applications #########
-printf "\n\n(Step 1 of 5): Installing Store applications\n"
+printf "\n\n(Step 1 of 6): Installing Store applications\n"
 
-ubuntu_apps 
+ubuntu_apps &>> installation.log
 # python_apps 
 
 ######### Install flatpak applications #########
-printf "(Step 2 of 5): Installing Flatpak applications\n"
+printf "(Step 2 of 6): Installing Flatpak applications\n"
 
-# flatpak_apps 
+flatpak_apps &>> installation.log
 
 ######### Install snap applications #########
-printf "(Step 3 of 5): Installing Snap applications\n"
+printf "(Step 3 of 6): Installing Snap applications\n"
 
-snap_apps
-# obs_install
+snap_apps &>> installation.log
 
 ######### install non-standard repository applications #########
-# printf "(Step 3 of 5): Installing non-standard repository applications\n"
+printf "(Step 4 of 6): Installing non-standard repository applications\n"
 
-# external_apps &>> installation.log
+external_apps &>> installation.log
 
 ######### Purge preinstalled Ubuntu applications #########
-printf "(Step 4 of 5): Purging preinstalled applications\n"
+printf "(Step 5 of 6): Purging preinstalled applications\n"
 
-remove_apps
+remove_apps &>> installation.log
 
 ######### Upgrade system and applications, then reboot #########
-printf "(Step 5 of 5): Upgrading Ubuntu base distribution image\n"
-upgrade_OS 
+printf "(Step 6 of 6): Installing operating system updates\n"
+upgrade_OS &>> installation.log
 
 printf "\nUpdate complete. Rebooting system...\n\n"
 sudo reboot
