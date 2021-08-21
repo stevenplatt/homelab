@@ -64,6 +64,18 @@ I addition to installing `kubectl` and `helm`, `kubectl` must be configured to c
 1. [Install kubeconfig file](https://docs.digitalocean.com/products/kubernetes/how-to/connect-to-cluster/)
 
 
+### Nginx Ingress Controller
+
+Inatalling an ingress controller must be done to allow deployed services to be reachable from outside the kubernetes cluster (see topology image above).
+
+1. `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
+1. `helm repo update`
+1. `helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true`
+
+An additional command is required to resolve an error relating to webhook timeouts when creating Kubernetes Ingress' ([source](https://stackoverflow.com/questions/61616203/nginx-ingress-controller-failed-calling-webhook)). 
+
+1. `kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission`
+
 ### Deploying Telecomsteve (Website)
 
 ### Deploying PiHole
