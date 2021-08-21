@@ -56,6 +56,7 @@ snap_apps(){
     sudo snap install doctl # Digital Ocean CLI
     sudo snap install aws-cli --classic # AWS CLI
     sudo snap install google-cloud-sdk --classic # Google Cloud CLI
+    sudo snap install terraform --candidate # Terraform CLI
 }
 
 # install 3rd Party Applications

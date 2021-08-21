@@ -130,3 +130,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Terraform operations files
+.terraform*
+terraform.*
