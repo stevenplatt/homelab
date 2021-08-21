@@ -32,8 +32,7 @@ The following containers are deployed with the Kebernetes cluster environment
   
 # Deployment Instructions
 
-## Infrastructure Deployment
-### Deploying Kubernetes
+## Deploying Kubernetes
 
 QTY 1: Digital Ocean Load Balancer  
 
@@ -48,7 +47,7 @@ To deploy teh Kubernetes cluster, Terraform must be installed to your local mach
 
 ...
 
-## Services Deployment
+## Installing Management Tools
 
 The Helm package manager is used to deploy services to the Kubernetes cluster.
 To deploy services to the Kubernetes cluster both `kubectl` and `helm` must be installed to your local machine. 
@@ -68,17 +67,27 @@ I addition to installing `kubectl` and `helm`, `kubectl` must be configured to c
 [Kubeconfig installation instructions](https://docs.digitalocean.com/products/kubernetes/how-to/connect-to-cluster/)
 
 
-### Nginx Ingress Controller
+## Configuring an Nginx Ingress Controller
 
 Inatalling an ingress controller must be done to allow deployed services to be reachable from outside the kubernetes cluster (see topology image above).
 
-1. `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
-2. `helm repo update`
-3. `helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true`
+An additional command is also required to resolve an error relating to webhook timeouts when creating Kubernetes Ingress' (step 4)([source](https://stackoverflow.com/questions/61616203/nginx-ingress-controller-failed-calling-webhook)). 
 
-An additional command is required to resolve an error relating to webhook timeouts when creating Kubernetes Ingress' ([source](https://stackoverflow.com/questions/61616203/nginx-ingress-controller-failed-calling-webhook)). 
+1. Add the nginx Helm repository.
 
-4. `kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission`
+`helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
+
+2. Refresh the local Helm repositories.
+
+`helm repo update`
+
+3. Install the nginx ingress. [source](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-on-digitalocean-kubernetes-using-helm)
+
+`helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true`
+
+4. Stop validation of webhook configuration.
+
+`kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission`
 
 
 ...
