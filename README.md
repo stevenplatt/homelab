@@ -27,10 +27,7 @@ The following containers are deployed with the Kebernetes cluster environment
 - Prometheus (Monitoring)
 - Grafana (Monitoring Dashboard)
 - PiHole (ad blocking)
-- OpenVPN (vpn)
 - Librespeed (speed test)
-- VSCode Server (Visual Studio Code in the browser)
-- OpenWRT (WiFi Router OS)
   
   
 # Deployment Instructions
@@ -56,12 +53,19 @@ To deploy teh Kubernetes cluster, Terraform must be installed to your local mach
 The Helm package manager is used to deploy services to the Kubernetes cluster.
 To deploy services to the Kubernetes cluster both `kubectl` and `helm` must be installed to your local machine. 
 
-1. [Kubectl install instructions](https://kubernetes.io/docs/tasks/tools/)
-1. [Helm install instructions](https://helm.sh/docs/intro/install/)
-
 I addition to installing `kubectl` and `helm`, `kubectl` must be configured to connect to the newly deployed Kubernetes cluster. This is done by downloading the new `kubeconfig` file created with the new Kubernetes cluster. 
 
-1. [Install kubeconfig file](https://docs.digitalocean.com/products/kubernetes/how-to/connect-to-cluster/)
+1. Install the `kubectl` CLI tool.
+
+[Kubectl install instructions](https://kubernetes.io/docs/tasks/tools/)
+
+2. Install the `helm` Kubernetes package manager.
+
+[Helm install instructions](https://helm.sh/docs/intro/install/)
+
+3. Download the `kubeconfig` file for your previously deployed Kubernetes cluster. 
+
+[Kubeconfig installation instructions](https://docs.digitalocean.com/products/kubernetes/how-to/connect-to-cluster/)
 
 
 ### Nginx Ingress Controller
@@ -69,17 +73,12 @@ I addition to installing `kubectl` and `helm`, `kubectl` must be configured to c
 Inatalling an ingress controller must be done to allow deployed services to be reachable from outside the kubernetes cluster (see topology image above).
 
 1. `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
-1. `helm repo update`
-1. `helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true`
+2. `helm repo update`
+3. `helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true`
 
 An additional command is required to resolve an error relating to webhook timeouts when creating Kubernetes Ingress' ([source](https://stackoverflow.com/questions/61616203/nginx-ingress-controller-failed-calling-webhook)). 
 
-1. `kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission`
+4. `kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission`
 
-### Deploying Telecomsteve (Website)
-
-### Deploying PiHole
-1. `helm repo add mojo2600 https://mojo2600.github.io/pihole-kubernetes/`
-1. `helm repo update`
 
 ...
