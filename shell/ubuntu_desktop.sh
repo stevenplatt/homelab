@@ -77,7 +77,9 @@ external_apps(){
 
     # install the latest version of the HELM Kubernetes Package Manager
     # https://helm.sh/docs/intro/install/
-    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | sh
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+    sudo chmod u+x get_helm.sh && ./get_helm.sh
+    rm ./get_helm.sh
 }
 
 # remove preinstalled apps
