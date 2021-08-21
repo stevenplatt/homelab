@@ -20,9 +20,9 @@ QTY 1: Digital Ocean Load Balancer ($5)
 
 QTY 1: Digital Ocean Kubernetes
 - Autoscaling Node Group
-  -  Min: 1 nodes; Max: 2 nodes ($5 - $10)
+  -  Min: 1 nodes; Max: 2 nodes ($10 - $20)
 
-#### Total: $10 - $15 / mo  
+#### Total: $15 - $25 / mo  
 
 
 ## Logical Topology
