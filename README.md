@@ -9,25 +9,16 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 <!--ts-->
 
 - [Cloud Environment](#cloud-environment)
-  - [Container List](#container-list)
+  - [Service List](#service-list)
 - [Deployment Instructions](#deployment-instructions)  
 <!--te-->
 
 # Cloud Environment
 
-QTY 1: Digital Ocean Load Balancer ($5) 
-
-QTY 1: Digital Ocean Kubernetes
-- Autoscaling Node Group
-  -  Min: 1 nodes; Max: 2 nodes ($10 - $20)
-
-#### Total: $15 - $25 / mo  
-
-
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/cloud_k8s.jpg?raw=true)
 
   
-## Container / Service List
+## Service List
 
 The following containers are deployed with the Kebernetes cluster environment
 
@@ -46,6 +37,16 @@ The following containers are deployed with the Kebernetes cluster environment
 
 ## Infrastructure Deployment
 ### Deploying Kubernetes
+
+
+QTY 1: Digital Ocean Load Balancer ($5) 
+
+QTY 1: Digital Ocean Kubernetes
+- Autoscaling Node Group
+  -  Min: 1 nodes; Max: 2 nodes ($10 - $20)
+
+#### Total: $15 - $25 / mo  
+
 ...
 
 ## Service Deployment
