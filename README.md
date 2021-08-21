@@ -15,6 +15,14 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 # Testbed Environment
 
+### Digital Ocean Services
+QTY 1: Load Balancer ($5) 
+
+QTY 1: Digital Ocean Kubernetes
+- Autoscaling Node Group
+  -  Min: 1 nodes; Max: 2 nodes ($5 - $10)
+
+#### Total: $10 - $15 / mo
 
 *The below graphic is outdated and pending an update*
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology_v3.png?raw=true)
