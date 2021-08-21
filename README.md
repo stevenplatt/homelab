@@ -9,7 +9,6 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 <!--ts-->
 
 - [Cloud Environment](#cloud-environment)
-  - [Logical Topology](#logical-topology) 
   - [Container List](#container-list)
 - [Deployment Instructions](#deployment-instructions)  
 <!--te-->
@@ -25,11 +24,10 @@ QTY 1: Digital Ocean Kubernetes
 #### Total: $15 - $25 / mo  
 
 
-## Logical Topology
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/cloud_k8s.jpg?raw=true)
 
   
-## Container List
+## Container / Service List
 
 The following containers are deployed with the Kebernetes cluster environment
 
