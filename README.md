@@ -32,7 +32,7 @@ The following containers are deployed with the Kebernetes cluster environment
   
 # Deployment Instructions
 
-## Deploying Kubernetes
+## Deploying Kubernetes using Terraform
 
 QTY 1: Digital Ocean Load Balancer  
 
@@ -43,16 +43,18 @@ QTY 1: Digital Ocean Kubernetes
 Terraform is used to deploy cloud infrastructure for the Kubernetes cluster. 
 To deploy teh Kubernetes cluster, Terraform must be installed to your local machine.
 
-1. [Terraform install instructions](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+1. Install the `terraform cli`
+
+  [Terraform install instructions](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
 ...
 
-## Installing Management Tools
+## Installing Cluster Management Tools
 
 The Helm package manager is used to deploy services to the Kubernetes cluster.
-To deploy services to the Kubernetes cluster both `kubectl` and `helm` must be installed to your local machine. 
+To deploy services to the Kubernetes cluster both `kubectl` and the `helm cli` must be installed to your local machine. 
 
-I addition to installing `kubectl` and `helm`, `kubectl` must be configured to connect to the newly deployed Kubernetes cluster. This is done by downloading the new `kubeconfig` file created with the new Kubernetes cluster. 
+I addition to installing `kubectl` and the `helm cli`, `kubectl` must be configured to connect to the newly deployed Kubernetes cluster. This is done by downloading the new `kubeconfig` file created with the new Kubernetes cluster. 
 
 1. Install the `kubectl` CLI tool.
 
@@ -85,7 +87,7 @@ An additional command is also required to resolve an error relating to webhook t
 
 `helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true`
 
-4. Stop validation of webhook configuration.
+4. Stop validation of webhook configurations.
 
 `kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission`
 
