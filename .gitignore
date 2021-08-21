@@ -133,4 +133,3 @@ dmypy.json
 
 # Terraform operations files
 .terraform*
-terraform.*

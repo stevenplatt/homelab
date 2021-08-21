@@ -26,7 +26,7 @@ QTY 1: Digital Ocean Kubernetes
 
 
 ## Logical Topology
-![alt text](https://github.com/stevenplatt/homelab/blob/main/img/cloud_k8s.jpg?raw=true)
+![alt text](https://github.com/stevenplatt/homelab/blob/main/cloud_k8s.jpg?raw=true)
 
   
 ## Container List
