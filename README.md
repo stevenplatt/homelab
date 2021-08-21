@@ -44,5 +44,10 @@ The following containers are deployed with the Kebernetes cluster environment
   
 # Deployment Instructions
 
+## Infrastructure Deployment
+### Deploying Kubernetes
+...
 
+## Service Deployment
+### Deploying Telecomsteve (Website)
 ...
