@@ -49,6 +49,6 @@ QTY 1: Digital Ocean Kubernetes
 
 ...
 
-## Service Deployment
+## Services Deployment
 ### Deploying Telecomsteve (Website)
 ...
