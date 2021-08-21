@@ -8,26 +8,28 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 <!--ts-->
 
-- [Testbed Environment](#testbed-environment)
+- [Cloud Environment](#cloud-environment)
+  - [Logical Topology](#logical-topology) 
   - [Container List](#container-list)
-- [Deployment Instructions](#deployment-instructions)
+- [Deployment Instructions](#deployment-instructions)  
 <!--te-->
 
-# Testbed Environment
+# Cloud Environment
 
-### Digital Ocean Services
 QTY 1: Load Balancer ($5) 
 
 QTY 1: Digital Ocean Kubernetes
 - Autoscaling Node Group
   -  Min: 1 nodes; Max: 2 nodes ($5 - $10)
 
-#### Total: $10 - $15 / mo
+#### Total: $10 - $15 / mo  
 
-*The below graphic is outdated and pending an update*
-![alt text](https://github.com/stevenplatt/homelab/blob/main/img/lab_topology_v3.png?raw=true)
 
-# Container List
+## Logical Topology
+![alt text](https://github.com/stevenplatt/homelab/blob/main/img/cloud_k8s.jpg?raw=true)
+
+  
+## Container List
 
 The following containers are deployed with the Kebernetes cluster environment
 
@@ -40,7 +42,8 @@ The following containers are deployed with the Kebernetes cluster environment
 - Librespeed (speed test)
 - VSCode Server (Visual Studio Code in the browser)
 - OpenWRT (WiFi Router OS)
-
+  
+  
 # Deployment Instructions
 
 
