@@ -47,26 +47,27 @@ QTY 1: Digital Ocean Kubernetes
 Terraform is used to deploy cloud infrastructure for the Kubernetes cluster. 
 To deploy teh Kubernetes cluster, Terraform must be installed to your local machine.
 
-[terraform install instructions](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+1. [Terraform install instructions](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
 ...
 
 ## Services Deployment
 
 The Helm package manager is used to deploy services to the Kubernetes cluster.
-To deploy services to the Kubernetes cluster both '<kubectl>' and '<helm>' must be installed to your local machine. 
+To deploy services to the Kubernetes cluster both `kubectl` and `helm` must be installed to your local machine. 
 
-[kubectl install instructions](https://kubernetes.io/docs/tasks/tools/)
-[helm install instructions](https://helm.sh/docs/intro/install/)
+1. [Kubectl install instructions](https://kubernetes.io/docs/tasks/tools/)
+1. [Helm install instructions](https://helm.sh/docs/intro/install/)
 
-I addition to installing '<kubectl>' and '<helm>', '<kubectl>' must be configured to connect to the newly deployed Kubernetes cluster. This is done by downloading the new '<kubeconfig>' file created with the new Kubernetes cluster. 
+I addition to installing `kubectl` and `helm`, `kubectl` must be configured to connect to the newly deployed Kubernetes cluster. This is done by downloading the new `kubeconfig` file created with the new Kubernetes cluster. 
 
-[download kubeconfig file](https://docs.digitalocean.com/products/kubernetes/how-to/connect-to-cluster/)
+1. [Install kubeconfig file](https://docs.digitalocean.com/products/kubernetes/how-to/connect-to-cluster/)
 
 
 ### Deploying Telecomsteve (Website)
 
 ### Deploying PiHole
-
+1. `helm repo add mojo2600 https://mojo2600.github.io/pihole-kubernetes/`
+1. `helm repo update`
 
 ...
