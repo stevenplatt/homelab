@@ -16,7 +16,7 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 # Cloud Environment
 
-QTY 1: Load Balancer ($5) 
+QTY 1: Digital Ocean Load Balancer ($5) 
 
 QTY 1: Digital Ocean Kubernetes
 - Autoscaling Node Group
