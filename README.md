@@ -20,7 +20,7 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
   
 ## Service List
 
-The following containers are deployed with the Kebernetes cluster environment
+The following containers are deployed with the Kebernetes cluster environment. This list is included for demonstration purposes and can be considered partial or otherwise incomplete. 
 
 - Telecomsteve (Website)
 - ResearchEng Portfolio (Website)
@@ -29,6 +29,7 @@ The following containers are deployed with the Kebernetes cluster environment
 - PiHole (ad blocking)
 - Librespeed (speed test)
   
+...
   
 # Deployment Instructions
 
@@ -89,13 +90,14 @@ I addition to installing `kubectl` and the `helm cli`, `kubectl` must be configu
 3. Download the `kubeconfig` file for your previously deployed Kubernetes cluster. 
 
 [Kubeconfig installation instructions](https://docs.digitalocean.com/products/kubernetes/how-to/connect-to-cluster/)
-
-
+   
+...
+   
 ## Configuring an Nginx Ingress Controller
 
 Inatalling an ingress controller must be done to allow deployed services to be reachable from outside the kubernetes cluster (see topology image above).
 
-An additional command is also required to resolve an error relating to webhook timeouts when creating Kubernetes Ingress' (step 4)([source](https://stackoverflow.com/questions/61616203/nginx-ingress-controller-failed-calling-webhook)). 
+An additional command is also required to resolve an error relating to webhook timeouts when creating a Kubernetes Ingress (step 4) ([source](https://stackoverflow.com/questions/61616203/nginx-ingress-controller-failed-calling-webhook)). 
 
 1. Add the nginx Helm repository.
 
@@ -112,6 +114,6 @@ An additional command is also required to resolve an error relating to webhook t
 4. Stop validation of webhook configurations.
 
 `kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission`
-
-
+  
 ...
+  
