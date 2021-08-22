@@ -14,7 +14,7 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
   - [Deploying Kubernetes using Terraform](#deploying-kubernetes-using-terraform)
   - [Installing Cluster Management Tools](#installing-cluster-management-tools)
   - [Configuring an Nginx Ingress Controller](#configuring-an-nginx-ingress-controller)
-  - [Optional: Deploy a Public Service Using SSL](#deploy-a-public-service-using-ssl)
+  - [Optional: Deploy a Public Service Using SSL](#optional:-deploy-a-public-service-using-ssl)
 <!--te-->
 
 # Cloud Environment
