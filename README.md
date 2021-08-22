@@ -26,7 +26,7 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 The following containers are deployed with the Kebernetes cluster environment. 
 
-This list is included for demonstration purposes and can be considered partial or otherwise incomplete. 
+This list is included for demonstration purposes and can be considered partial or otherwise incomplete. Documentation for individual service deployment instructions can be found on the wiki section of this repository.
 
 - Telecomsteve (Website)
 - ResearchEng Portfolio (Website)
