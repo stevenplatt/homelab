@@ -41,13 +41,35 @@ QTY 1: Digital Ocean Kubernetes
   -  Min: 1 nodes; Max: 2 nodes 
 
 Terraform is used to deploy cloud infrastructure for the Kubernetes cluster. 
-To deploy teh Kubernetes cluster, Terraform must be installed to your local machine.
+To deploy teh Kubernetes cluster, Terraform must be installed to your local machine ([source](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/kubernetes_cluster)).
 
-1. Install the `terraform cli`
+1. Install the terraform cli.
 
-  [Terraform install instructions](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+[Terraform install instructions](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
+2. Clone the homelab repository.
+
+`git clone https://github.com/stevenplatt/homelab.git`
+`cd homelab/`
+
+3. Initialize Terraform within the repository directory. 
+
+`terraform init`
+
+4. Double-check the planned infrastructure changes. 
+
+`terraform plan`
+
+5. Assuming everything looks correct, launch the infrastructure deployment. 
+
+`terraform deploy`
+
+Terraform will request the Digital Ocean API token (it must have read/write priveledges), and to confirm `yes` a final time to apply the change.
+
+**Note:** Using `terraform destroy` from the same directory will delete the infrastructure that was launched using `terraform deploy`.
+  
 ...
+  
 
 ## Installing Cluster Management Tools
 
