@@ -1,4 +1,4 @@
-# Homelab Research Testbed (under construction)
+# Homelab Research Testbed 
 
 This repository holds configurations and documentation for deploying my personal homelab and network research tesbed.
 
