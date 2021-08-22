@@ -10,7 +10,11 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 - [Cloud Environment](#cloud-environment)
   - [Service List](#service-list)
-- [Deployment Instructions](#deployment-instructions)  
+- [Deployment Instructions](#deployment-instructions)
+  - [Deploying Kubernetes using Terraform](#deploying-kubernetes-using-terraform)
+  - [Installing Cluster Management Tools](#installing-cluster-management-tools)
+  - [Configuring an Nginx Ingress Controller](#configuring-an-nginx-ingress-controller)
+  - [Optional: Deploy a Sample App Using SSL](#optional:-deploy-a-sample-app-using-ssl)
 <!--te-->
 
 # Cloud Environment
@@ -44,7 +48,7 @@ QTY 1: Digital Ocean Kubernetes
   -  Min: 1 nodes; Max: 2 nodes 
 
 Terraform is used to deploy cloud infrastructure for the Kubernetes cluster. 
-To deploy teh Kubernetes cluster, Terraform must be installed to your local machine ([source](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/kubernetes_cluster)).
+To deploy teh Kubernetes cluster, Terraform must be installed to your local machine ([source 1](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/kubernetes_cluster)) ([source 2](https://www.youtube.com/watch?v=U5suIJwobiQ)).
 
 1. Install the terraform cli.
 
@@ -108,7 +112,7 @@ An additional command is also required to resolve an error relating to webhook t
 
 `helm repo update`
 
-3. Install the nginx ingress. [source](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-on-digitalocean-kubernetes-using-helm)
+3. Install the nginx ingress. ([source](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-on-digitalocean-kubernetes-using-helm))
 
 `helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true`
 
@@ -118,6 +122,6 @@ An additional command is also required to resolve an error relating to webhook t
   
 ...
   
-## Optional: Deploy a Sample App Using SSL
+## Optional: Deploy a Public Service Using SSL
 
 To test that everything is deployed correctly, a sample app can be pushed to the Kubernetes cluster using [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-on-digitalocean-kubernetes-using-helm) from Digital Ocean. 
