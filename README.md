@@ -20,7 +20,9 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
   
 ## Service List
 
-The following containers are deployed with the Kebernetes cluster environment. This list is included for demonstration purposes and can be considered partial or otherwise incomplete. 
+The following containers are deployed with the Kebernetes cluster environment. 
+
+This list is included for demonstration purposes and can be considered partial or otherwise incomplete. 
 
 - Telecomsteve (Website)
 - ResearchEng Portfolio (Website)
@@ -50,8 +52,7 @@ To deploy teh Kubernetes cluster, Terraform must be installed to your local mach
 
 2. Clone the homelab repository.
 
-`git clone https://github.com/stevenplatt/homelab.git`
-`cd homelab/`
+`git clone https://github.com/stevenplatt/homelab.git && cd homelab/`
 
 3. Initialize Terraform within the repository directory. 
 
@@ -95,7 +96,7 @@ I addition to installing `kubectl` and the `helm cli`, `kubectl` must be configu
    
 ## Configuring an Nginx Ingress Controller
 
-Inatalling an ingress controller must be done to allow deployed services to be reachable from outside the kubernetes cluster (see topology image above).
+Installing an ingress controller must be done to allow deployed services to be reachable from outside the kubernetes cluster (see topology image above).
 
 An additional command is also required to resolve an error relating to webhook timeouts when creating a Kubernetes Ingress (step 4) ([source](https://stackoverflow.com/questions/61616203/nginx-ingress-controller-failed-calling-webhook)). 
 
@@ -117,3 +118,6 @@ An additional command is also required to resolve an error relating to webhook t
   
 ...
   
+## Optional: Deploy a Sample App Using SSL
+
+To test that everything is deployed correctly, a sample app can be pushed to the Kubernetes cluster using [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-on-digitalocean-kubernetes-using-helm) from Digital Ocean. 
