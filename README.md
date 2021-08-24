@@ -8,8 +8,15 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/cloud_k8s.jpg?raw=true)
 
-  
-## Service List
+## Cluster Components
+
+**QTY 1:** Digital Ocean Load Balancer  
+
+**QTY 1:** Digital Ocean Kubernetes
+- Autoscaling Node Group
+  -  Min: 1 nodes; Max: 2 nodes 
+
+## Services List
 
 The following containers are deployed with the Kebernetes cluster environment. 
 
@@ -21,8 +28,6 @@ This list is included for demonstration purposes and can be considered partial o
 - Grafana (Monitoring Dashboard)
 - PiHole (ad blocking)
 - Librespeed (speed test)
-  
-...
   
 # Deployment Instructions
 
