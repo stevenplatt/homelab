@@ -26,6 +26,7 @@ ubuntu_apps(){
     sudo apt install -y pitivi # installed from ubuntu repo for better compatibility
     sudo apt install -y unrar
     sudo apt install -y ansible
+    sudo apt install -y docker.io #install docker from Ubuntu repository
 }
 
 # install dependencies for running flask web apps
