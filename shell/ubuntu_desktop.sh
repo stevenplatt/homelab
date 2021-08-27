@@ -27,6 +27,7 @@ ubuntu_apps(){
     sudo apt install -y unrar
     sudo apt install -y ansible
     sudo apt install -y docker.io #install docker from Ubuntu repository
+    sudo apt install -y net-tools # install 'ifconfig' and other tools if not present
 }
 
 # install dependencies for running flask web apps
