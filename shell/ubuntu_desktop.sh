@@ -85,15 +85,10 @@ external_apps(){
     sudo chmod u+x get_helm.sh && ./get_helm.sh
     rm ./get_helm.sh
     
-    # install AWS Elastic Beanstalk CLI Tools
-    # https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html#eb-cli3-install.scripts
-    # https://github.com/aws/aws-elastic-beanstalk-cli-setup
-    git clone https://github.com/aws/aws-elastic-beanstalk-cli-setup.git
-    ./aws-elastic-beanstalk-cli-setup/scripts/bundled_installer
-    # Add EB python environment and 'EB' symlink to path
-    echo 'export PATH="/home/$USER/.ebcli-virtual-env/executables:$PATH"' >> ~/.bash_profile && source ~/.bash_profile
-    echo 'export PATH=/home/$USER/.pyenv/versions/3.7.2/bin:$PATH' >> /home/$USER/.bash_profile && source /home/$USER/.bash_profile
-    rm -rf ./aws-elastic-beanstalk-cli-setup/
+    # install AWS and Elastic Beanstalk CLI Tools
+    # https://docs.aws.amazon.com/cli/latest/userguide/install-linux.html#install-linux-pip
+    pip install --upgrade awscli
+    pip install --upgrade awsebcli
 }
 
 # remove preinstalled apps
