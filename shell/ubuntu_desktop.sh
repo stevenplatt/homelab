@@ -56,7 +56,7 @@ flatpak_apps(){
 snap_apps(){
     sudo snap install kubectl --classic # Kubernetes CLI
     sudo snap install doctl # Digital Ocean CLI
-    sudo snap install aws-cli --classic # AWS CLI
+    sudo snap install aws-cli --classic # AWS CLI -- Alternate method: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
     sudo snap install google-cloud-sdk --classic # Google Cloud CLI
     sudo snap install terraform --candidate # Terraform CLI
 }
