@@ -4,7 +4,7 @@ This repository holds configurations and documentation for deploying my personal
 
 The lab environment is intended to run under a infrastructure-as-code model, with all services running as containers deployable by Ansible, Terraform, and Helm within Kubernetes. Currently the lab is run in the cloud within [Digital Ocean Kubernetes](https://www.digitalocean.com/products/kubernetes/). 
 
-## Table of Contents
+### Table of Contents
 
 [Cloud Environment](#cloud)
 
