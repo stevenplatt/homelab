@@ -7,6 +7,7 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 ## Table of Contents
 
 [Cloud Environment](#cloud)
+
 [Developer Environments](#desktop)
 
 <a name="cloud"/>
