@@ -6,7 +6,7 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 # Cloud Environment
 
-![alt text](https://github.com/stevenplatt/homelab/img/blob/main/cloud_k8s.jpg?raw=true)
+![alt text](https://github.com/stevenplatt/homelab/blob/main/img/cloud_k8s.jpg?raw=true)
 
 ## Cluster Components
 
@@ -33,13 +33,13 @@ This list is included for demonstration purposes and can be considered partial o
 
 Complete instructions for deploying both Kubernetes and containerized microservices can be found in the [wiki](https://github.com/stevenplatt/homelab/wiki) pages for this repository. 
 
-# Desktop Environments
+# Developer Environments
 
 This repository also holds configurations for desktop environments. 
 
 ## Windows
 
-Windows versions 10 and 11 can be configured using the ``` winget ``` utility. Winget is enabled automatically when app install is installed from the Windows Store [link](https://www.microsoft.com/store/productId/9NBLGGH4NNS1).
+Windows versions 10 and 11 can be configured using the ``` winget ``` utility. Winget is enabled automatically when app install is installed from the [Windows Store](https://www.microsoft.com/store/productId/9NBLGGH4NNS1).
 
 #### Bulk App Installation (Winget)
 
