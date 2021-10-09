@@ -53,6 +53,15 @@ A json of installed programs can be exported using the command:
 
 ``` winget export -o path\to\export.json ```
 
+The following items are not installed with the winget utility and must be manually installed: 
+
+- Ansible
+- Terraform
+- Inkscape
+- Mendeley
+- Helm
+- Digital Ocean command line tools
+
 ## Linux
 
 A shell script for either Fedora or Ubuntu distributions can be run directly from the Linux terminal to bulk install pre-set applications. 
