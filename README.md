@@ -76,6 +76,8 @@ The following items are not installed with the winget utility and must be manual
 
 A shell script for either Fedora or Ubuntu distributions can be run directly from the Linux terminal to bulk install pre-set applications. 
 
+#### Bulk App Installation (Bash Script)
+
 From the Linux terminal: 
 
 - ``` git clone https://github.com/stevenplatt/homelab.git ``` 
