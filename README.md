@@ -41,7 +41,7 @@ This repository also holds configurations for desktop environments.
 
 Windows versions 10 and 11 can be configured using the ``` winget ``` utility. Winget is enabled automatically when app install is installed from the Windows Store [link](https://www.microsoft.com/store/productId/9NBLGGH4NNS1).
 
-### Bulk App Installation (Winget)
+#### Bulk App Installation (Winget)
 
 Open Windows PowerShell with administrator priveledges. 
 
@@ -59,7 +59,7 @@ A shell script for either Fedora or Ubuntu distributions can be run directly fro
 
 From the Linux terminal: 
 
-1. ``` git clone https://github.com/stevenplatt/homelab.git ``` 
-2. ``` cd homelab/desktop/linux ```
-3. ``` bash ubuntu_deploy.sh ``` or ``` bash fedora_deploy.sh ```
+- ``` git clone https://github.com/stevenplatt/homelab.git ``` 
+- ``` cd homelab/desktop/linux ```
+- ``` bash ubuntu_deploy.sh ``` or ``` bash fedora_deploy.sh ```
 
