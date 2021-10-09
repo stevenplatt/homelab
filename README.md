@@ -6,7 +6,7 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 # Cloud Environment
 
-![alt text](https://github.com/stevenplatt/homelab/blob/main/cloud_k8s.jpg?raw=true)
+![alt text](https://github.com/stevenplatt/homelab/img/blob/main/cloud_k8s.jpg?raw=true)
 
 ## Cluster Components
 
@@ -29,6 +29,37 @@ This list is included for demonstration purposes and can be considered partial o
 - PiHole (ad blocking)
 - Librespeed (speed test)
   
-# Deployment Instructions
+## Cloud Deployment
 
 Complete instructions for deploying both Kubernetes and containerized microservices can be found in the [wiki](https://github.com/stevenplatt/homelab/wiki) pages for this repository. 
+
+# Desktop Environments
+
+This repository also holds configurations for desktop environments. 
+
+## Windows
+
+Windows versions 10 and 11 can be configured using the ``` winget ``` utility. Winget is enabled automatically when app install is installed from the Windows Store [link](https://www.microsoft.com/store/productId/9NBLGGH4NNS1).
+
+### Bulk App Installation (Winget)
+
+Open Windows PowerShell with administrator priveledges. 
+
+The Windows installation file is located at ``` .../homelab/desktop/windows/win11_deploy.json ``` and can be run using the PowerShell command: 
+
+``` winget import -i path\to\win11_deploy.json ```
+
+A json of installed programs can be exported using the command: 
+
+``` winget export -o path\to\export.json ```
+
+## Linux
+
+A shell script for either Fedora or Ubuntu distributions can be run directly from the Linux terminal to bulk install pre-set applications. 
+
+From the Linux terminal: 
+
+1. ``` git clone https://github.com/stevenplatt/homelab.git ``` 
+2. ``` cd homelab/desktop/linux ```
+3. ``` bash ubuntu_deploy.sh ``` or ``` bash fedora_deploy.sh ```
+
