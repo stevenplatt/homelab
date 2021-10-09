@@ -73,7 +73,7 @@ resource "digitalocean_kubernetes_cluster" "homelab" {
     size       = "s-1vcpu-2gb"
     auto_scale = true # allow autoscaling between the min/max node counts
     min_nodes  = 1
-    max_nodes  = 2
+    max_nodes  = 3
   }
 }
 

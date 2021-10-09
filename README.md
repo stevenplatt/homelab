@@ -14,7 +14,7 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 **QTY 1:** Digital Ocean Kubernetes
 - Autoscaling Node Group
-  -  Min: 1 nodes; Max: 2 nodes 
+  -  Min: 1 nodes; Max: 3 nodes 
 
 ## Services List
 
