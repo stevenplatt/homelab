@@ -97,7 +97,7 @@
 					"PackageIdentifier" : "Amazon.AWSCLI"
 				},
 				{
-					"PackageIdentifier" : "Apache.OpenOffice"
+					"PackageIdentifier" : "Git.Git"
 				}
 			],
 			"SourceDetails" : 
