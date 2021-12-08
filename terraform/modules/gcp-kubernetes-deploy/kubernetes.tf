@@ -1,22 +1,7 @@
-variable "gke_username" {
-  default     = ""
-  description = "gke username"
-}
-
-variable "gke_password" {
-  default     = ""
-  description = "gke password"
-}
-
-variable "gke_num_nodes" {
-  default     = 2
-  description = "number of gke nodes"
-}
-
 # GKE cluster
-resource "google_container_cluster" "primary" {
+resource "google_container_cluster" "homelab" {
   name     = "${var.project_id}-gke"
-  location = var.region
+  location = var.location
   
   # We can't create a cluster with no node pool defined, but we want to only use
   # separately managed node pools. So we create the smallest possible default
@@ -29,10 +14,10 @@ resource "google_container_cluster" "primary" {
 }
 
 # Separately Managed Node Pool
-resource "google_container_node_pool" "primary_nodes" {
-  name       = "${google_container_cluster.primary.name}-node-pool"
-  location   = var.region
-  cluster    = google_container_cluster.primary.name
+resource "google_container_node_pool" "homelab_nodes" {
+  name       = "${google_container_cluster.homelab.name}-node-pool"
+  location   = var.location
+  cluster    = google_container_cluster.homelab.name
   node_count = var.gke_num_nodes
 
   node_config {
@@ -46,7 +31,7 @@ resource "google_container_node_pool" "primary_nodes" {
     }
 
     # preemptible  = true
-    machine_type = "n1-standard-1"
+    machine_type = "n2-standard-2"
     tags         = ["gke-node", "${var.project_id}-gke"]
     metadata = {
       disable-legacy-endpoints = "true"
@@ -65,11 +50,11 @@ resource "google_container_node_pool" "primary_nodes" {
 # provider "kubernetes" {
 #   load_config_file = "false"
 
-#   host     = google_container_cluster.primary.endpoint
+#   host     = google_container_cluster.homelab.endpoint
 #   username = var.gke_username
 #   password = var.gke_password
 
-#   client_certificate     = google_container_cluster.primary.master_auth.0.client_certificate
-#   client_key             = google_container_cluster.primary.master_auth.0.client_key
-#   cluster_ca_certificate = google_container_cluster.primary.master_auth.0.cluster_ca_certificate
+#   client_certificate     = google_container_cluster.homelab.master_auth.0.client_certificate
+#   client_key             = google_container_cluster.homelab.master_auth.0.client_key
+#   cluster_ca_certificate = google_container_cluster.homelab.master_auth.0.cluster_ca_certificate
 # }
