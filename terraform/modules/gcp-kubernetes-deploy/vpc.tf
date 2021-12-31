@@ -16,7 +16,8 @@ resource "google_compute_subnetwork" "subnet" {
 # Assigning firewall rules to the network IP space
 ################################################################
 
-# source = https://github.com/MinaProtocol/mina/blob/develop/automation/terraform/modules/google-cloud/vpc-network/main.tf
+# https://cloud.google.com/kubernetes-engine/docs/how-to/exposing-apps
+
 resource "google_compute_firewall" "homelab_ingress" {
   name    = "${var.project_id}-homelab-ingress"
   network = google_compute_network.vpc.name
@@ -29,13 +30,11 @@ resource "google_compute_firewall" "homelab_ingress" {
 
   allow {
     protocol = "tcp"
-    ports    = ["10000-11000"]
+    ports    = ["30000-32767"] # this is the GKE nodeport range
   }
 
   allow {
     protocol = "udp"
-    ports    = ["10000-11000"]
+    ports    = ["30000-32767"]
   }
-
-  source_tags = ["homelab-ports"]
 }
