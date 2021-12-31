@@ -57,7 +57,7 @@ ubuntu_apps(){
     sudo apt install -y google-cloud-sdk
     sudo apt install -y google-cloud-sdk-app-engine-python
     sudo apt install -y google-cloud-sdk-app-engine-python-extras
-    sudo apt install -y google-cloud-sdk-app-engine-java
+    # sudo apt install -y google-cloud-sdk-app-engine-java
     sudo apt install -y google-cloud-sdk-app-engine-go
     sudo apt install -y google-cloud-sdk-bigtable-emulator
     sudo apt install -y google-cloud-sdk-cbt
