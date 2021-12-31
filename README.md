@@ -2,7 +2,7 @@
 
 This repository holds configurations and documentation for deploying my personal homelab and network research tesbed.
 
-The lab environment is intended to run under a infrastructure-as-code model, with all services running as containers deployable by Ansible, Terraform, and Helm within Kubernetes. Currently the lab is run in the cloud within [Digital Ocean Kubernetes](https://www.digitalocean.com/products/kubernetes/). 
+The lab environment is intended to run under a infrastructure-as-code model, with all services running as containers deployable by Ansible, Terraform, and Helm within Kubernetes. Currently the lab is run in the cloud within [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine). 
 
 ### Table of Contents
 
@@ -16,7 +16,7 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/img/cloud_k8s.jpg?raw=true)
 
-## Cluster Components
+## Cluster Components (outdated)
 
 **QTY 1:** Digital Ocean Load Balancer  
 
@@ -70,7 +70,6 @@ The following items are not installed with the winget utility and must be manual
 - Inkscape
 - Mendeley
 - Helm
-- Digital Ocean command line tools
 
 ## Linux
 
@@ -84,3 +83,6 @@ From the Linux terminal:
 - ``` cd homelab/desktop/linux ```
 - ``` bash ubuntu_deploy.sh ``` or ``` bash fedora_deploy.sh ```
 
+## Kubernetes
+
+Kubectl can be manually configured to connect to the deployed Kubernetes instance with the instructions provided by [Google Cloud](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl).
