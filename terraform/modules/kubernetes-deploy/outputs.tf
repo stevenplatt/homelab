@@ -12,20 +12,15 @@ output "project_id" {
 }
 
 # Kubernetes
-/* output "kubernetes_cluster_name" {
+output "kubernetes_cluster_name" {
   value       = google_container_cluster.homelab.name
   description = "GKE Cluster Name"
 }
 
 output "kubernetes_cluster_host" {
   value       = google_container_cluster.homelab.endpoint
-  description = "GKE Cluster Host"
+  description = "GKE Cluster IP"
 }
-
-output "kubernetes_cluster_host" {
-  value       = google_container_cluster.homelab.endpoint
-  description = "GKE Cluster Host"
-} */
 
 output "gke_node_count" {
   value       = var.gke_num_nodes

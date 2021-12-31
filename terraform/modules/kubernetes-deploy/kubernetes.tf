@@ -1,4 +1,23 @@
-# GKE cluster
+################################################################
+# Declaring imported variables
+################################################################
+
+variable "project_id" {
+}
+
+variable "region" {
+}
+
+variable "gke_num_nodes" {
+}
+
+variable "location" {
+}
+
+################################################################
+# Deploying the Kubernetes cluster
+################################################################
+
 resource "google_container_cluster" "homelab" {
   name     = "${var.project_id}-gke"
   location = var.location

@@ -1,5 +1,8 @@
-# Google Cloud Platform
+################################################################
+# Declaring deployment variable values
+################################################################
 
+# Google Cloud Platform
 variable "project_id" {
   default     = "homelab"
   description = "name of this Terraform project"
@@ -11,17 +14,6 @@ variable "region" {
 }
 
 # Kubernetes
-
-variable "gke_username" {
-  default     = ""
-  description = "gke username"
-}
-
-variable "gke_password" {
-  default     = ""
-  description = "gke password"
-}
-
 variable "gke_num_nodes" {
   default     = 1
   description = "number of gke nodes"
