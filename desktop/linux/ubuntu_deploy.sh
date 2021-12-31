@@ -5,8 +5,13 @@
 update_repositories(){
     sudo apt install -y flatpak
     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
+    
+    # add Google Cloud SDK Repo 
+    # https://cloud.google.com/sdk/docs/install#deb
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
     sudo apt update -y
+    sudo apt install -y curl
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 }
 
 ubuntu_apps(){
@@ -27,6 +32,7 @@ ubuntu_apps(){
     sudo apt install -y pitivi # installed from ubuntu repo for better compatibility
     sudo apt install -y unrar
     sudo apt install -y ansible
+    sudo apt install -y kubectl
     sudo apt install -y docker.io #install docker from Ubuntu repository
     sudo apt install -y net-tools # install 'ifconfig' and other tools if not present
     
@@ -39,6 +45,22 @@ ubuntu_apps(){
     sudo apt install -y libsqlite3-dev 
     sudo apt install -y libreadline-dev 
     sudo apt install -y libbz2-dev
+    
+    # Install Google Cloud SDK's
+    # https://cloud.google.com/sdk/docs/install#deb
+    sudo apt install -y google-cloud-sdk
+    sudo apt install -y google-cloud-sdk-app-engine-python
+    sudo apt install -y google-cloud-sdk-app-engine-python-extras
+    sudo apt install -y google-cloud-sdk-app-engine-java
+    sudo apt install -y google-cloud-sdk-app-engine-go
+    sudo apt install -y google-cloud-sdk-bigtable-emulator
+    sudo apt install -y google-cloud-sdk-cbt
+    sudo apt install -y google-cloud-sdk-cloud-build-local
+    sudo apt install -y google-cloud-sdk-datalab
+    sudo apt install -y google-cloud-sdk-datastore-emulator
+    sudo apt install -y google-cloud-sdk-firestore-emulator
+    sudo apt install -y google-cloud-sdk-pubsub-emulator 
+    # run 'gcloud init' to log into the desired Google Cloud project
 }
 
 # install flatpak apps
@@ -56,9 +78,7 @@ flatpak_apps(){
 
 # install snap apps
 snap_apps(){
-    sudo snap install kubectl --classic # Kubernetes CLI
     sudo snap install doctl # Digital Ocean CLI
-    sudo snap install google-cloud-sdk --classic # Google Cloud CLI
     sudo snap install terraform --candidate # Terraform CLI
 }
 
