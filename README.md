@@ -16,11 +16,11 @@ The lab environment is intended to run under a infrastructure-as-code model, wit
 
 ![alt text](https://github.com/stevenplatt/homelab/blob/main/img/cloud_k8s.jpg?raw=true)
 
-## Cluster Components (outdated)
+## Cluster Components
 
-**QTY 1:** Digital Ocean Load Balancer  
+**QTY 1:** Google Cloud Load Balancer  
 
-**QTY 1:** Digital Ocean Kubernetes
+**QTY 1:** Google Kubernetes Engine Cluster
 - Autoscaling Node Group
   -  Min: 1 nodes; Max: 3 nodes 
 
