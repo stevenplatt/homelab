@@ -19,6 +19,9 @@
 					"PackageIdentifier" : "GIMP.GIMP"
 				},
 				{
+					"PackageIdentifier" : "Google.CloudSDK"
+				},
+				{
 					"PackageIdentifier" : "GitHub.GitHubDesktop"
 				},
 				{
