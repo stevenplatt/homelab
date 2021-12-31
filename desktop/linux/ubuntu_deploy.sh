@@ -67,6 +67,7 @@ ubuntu_apps(){
     sudo apt install -y google-cloud-sdk-firestore-emulator
     sudo apt install -y google-cloud-sdk-pubsub-emulator 
     # run 'gcloud init' to log into the desired Google Cloud project
+    # run 'gcloud auth application-default login' to use your local Google credentials to execute API calls
 }
 
 # install flatpak apps
