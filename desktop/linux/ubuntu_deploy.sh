@@ -3,15 +3,20 @@
 
 # enable third party repositories 
 update_repositories(){
+    sudo apt install -y curl
     sudo apt install -y flatpak
     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     
-    # add Google Cloud SDK Repo 
+    # add Google Cloud SDK repository 
     # https://cloud.google.com/sdk/docs/install#deb
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-    sudo apt update -y
-    sudo apt install -y curl
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+    
+    # add Terraform repository
+    curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+    sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+    
+    sudo apt update -y
 }
 
 ubuntu_apps(){
@@ -33,6 +38,7 @@ ubuntu_apps(){
     sudo apt install -y unrar
     sudo apt install -y ansible
     sudo apt install -y kubectl
+    sudo apt install -y terraform
     sudo apt install -y docker.io #install docker from Ubuntu repository
     sudo apt install -y net-tools # install 'ifconfig' and other tools if not present
     
@@ -74,12 +80,6 @@ flatpak_apps(){
     sudo flatpak install -y flathub org.inkscape.Inkscape
     sudo flatpak install -y flathub org.gimp.GIMP
     sudo flatpak install -y flathub com.discordapp.Discord
-}
-
-# install snap apps
-snap_apps(){
-    sudo snap install doctl # Digital Ocean CLI
-    sudo snap install terraform --candidate # Terraform CLI
 }
 
 # install 3rd Party Applications
@@ -133,33 +133,28 @@ printf "This process may take up to 30 minutes, depending on network speed.\n\n"
 update_repositories &>> installation.log
 
 ######### Install store applications #########
-printf "\n\n(Step 1 of 6): Installing Store applications\n"
+printf "\n\n(Step 1 of 5): Installing Store applications\n"
 
 ubuntu_apps &>> installation.log
 # python_apps 
 
 ######### Install flatpak applications #########
-printf "(Step 2 of 6): Installing Flatpak applications\n"
+printf "(Step 2 of 5): Installing Flatpak applications\n"
 
 flatpak_apps &>> installation.log
 
-######### Install snap applications #########
-printf "(Step 3 of 6): Installing Snap applications\n"
-
-snap_apps &>> installation.log
-
 ######### install non-standard repository applications #########
-printf "(Step 4 of 6): Installing non-standard repository applications\n"
+printf "(Step 3 of 5): Installing non-standard repository applications\n"
 
 external_apps &>> installation.log
 
 ######### Purge preinstalled Ubuntu applications #########
-printf "(Step 5 of 6): Purging preinstalled applications\n"
+printf "(Step 4 of 5): Purging preinstalled applications\n"
 
 remove_apps &>> installation.log
 
 ######### Upgrade system and applications, then reboot #########
-printf "(Step 6 of 6): Installing operating system updates\n"
+printf "(Step 5 of 5): Installing operating system updates\n"
 upgrade_OS &>> installation.log
 
 printf "\nUpdate complete. Rebooting system...\n\n"
