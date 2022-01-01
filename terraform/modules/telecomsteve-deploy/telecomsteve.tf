@@ -83,26 +83,44 @@ resource "kubernetes_deployment" "website-deployment" {
 }
 
 # defining the Kubernetes services
-resource "kubernetes_service" "cluster-ip-service" {
-  metadata {
-    name = "cluster-ip-service"
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment.website-deployment.metadata.0.labels.app
-    }
-    port {
-      protocol = "TCP"
-      port        = 80
-      target_port = 8080
-    }
-    type = "ClusterIP"
-  }
-} 
+# resource "kubernetes_service" "cluster-ip-service" {
+#   metadata {
+#     name = "cluster-ip-service"
+#   }
+#   spec {
+#     selector = {
+#       app = kubernetes_deployment.website-deployment.metadata.0.labels.app
+#     }
+#     port {
+#       protocol = "TCP"
+#       port        = 80
+#       target_port = 8080
+#     }
+#     type = "ClusterIP"
+#   }
+# } 
 
-resource "kubernetes_service" "nodeport-service" {
+# resource "kubernetes_service" "nodeport-service" {
+#   metadata {
+#     name = "nodeport-service"
+#     namespace = "default"
+#   }
+#   spec {
+#     selector = {
+#       app = kubernetes_deployment.website-deployment.metadata.0.labels.app
+#     }
+#     port {
+#       protocol = "TCP"
+#       port        = 80
+#       target_port = 5000
+#     }
+#     type = "NodePort"
+#   }
+# }
+
+resource "kubernetes_service" "load-balancer" {
   metadata {
-    name = "nodeport-service"
+    name = "load-balancer"
     namespace = "default"
   }
   spec {
@@ -114,6 +132,6 @@ resource "kubernetes_service" "nodeport-service" {
       port        = 80
       target_port = 5000
     }
-    type = "NodePort"
+    type = "LoadBalancer"
   }
 }

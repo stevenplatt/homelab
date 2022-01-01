@@ -29,7 +29,9 @@ output "cluster_ip" {
 
 
 # telecomsteve website deployment
-output "telecomsteve_port" {
-  value       = module.telecomsteve-deploy.telecomsteve_nodeport
+output "telecomsteve_website_ip" {
+  value       = module.telecomsteve-deploy.telecomsteve_ip
   description = "External IP for the telecomsteve website"
 }
+
+# telecomsteve-flask.eba-wjx3pbpf.us-east-2.elasticbeanstalk.com
