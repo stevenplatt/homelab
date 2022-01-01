@@ -61,6 +61,17 @@ resource "kubernetes_deployment" "website-deployment" {
         container {
           image = "docker.io/telecomsteve/telecomsteve-flask:main"
           name  = "telecomsteve-flask"
+          resources {
+            # source: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+            limits = {
+              cpu    = "0.5"
+              memory = "512Mi"
+            }
+            requests = {
+              cpu    = "100m"
+              memory = "256Mi"
+            }
+          }
           port {
             name           = "port-5000"
             container_port = 5000
@@ -105,4 +116,4 @@ resource "kubernetes_service" "nodeport-service" {
     }
     type = "NodePort"
   }
-} 
+}
