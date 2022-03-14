@@ -61,6 +61,7 @@ resource "kubernetes_deployment" "website-deployment" {
         container {
           image = "docker.io/telecomsteve/telecomsteve-flask:main"
           name  = "telecomsteve-flask"
+          image_pull_policy = "Always"
           resources {
             # source: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
             limits = {
