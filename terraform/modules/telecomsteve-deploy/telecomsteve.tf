@@ -44,7 +44,7 @@ resource "kubernetes_deployment" "website-deployment" {
     namespace = "default"
   }
   spec {
-    replicas = 2
+    replicas = 1
 
     selector {
       match_labels = {
@@ -64,12 +64,12 @@ resource "kubernetes_deployment" "website-deployment" {
           resources {
             # source: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
             limits = {
-              cpu    = "0.5"
-              memory = "512Mi"
+              cpu    = "2"
+              memory = "4Gi"
             }
             requests = {
-              cpu    = "100m"
-              memory = "256Mi"
+              cpu    = "1"
+              memory = "2Gi"
             }
           }
           port {
