@@ -40,6 +40,7 @@ ubuntu_apps(){
     sudo apt install -y unrar
     sudo apt install -y ansible
     sudo apt install -y kubectl
+    sudo apt install -y deepin-boot-maker
     sudo apt install -y terraform
     sudo apt install -y docker.io #install docker from Ubuntu repository
     sudo apt install -y net-tools # install 'ifconfig' and other tools if not present
@@ -90,12 +91,6 @@ external_apps(){
     sudo apt install -y ./google-chrome-stable_current_amd64.deb
     rm ./google-chrome-stable_current_amd64.deb
 
-    # belenaEtcher: https://www.fossmint.com/etcher-usb-sd-card-bootable-image-creator-for-linux/
-    echo "deb https://deb.etcher.io stable etcher" | sudo tee /etc/apt/sources.list.d/balena-etcher.list
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61
-    sudo apt update
-    sudo apt install -y balena-etcher-electron
-
     # install Papyrus icon theme
     sudo wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install.sh | sh
 
@@ -104,11 +99,6 @@ external_apps(){
     curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
     sudo chmod u+x get_helm.sh && ./get_helm.sh
     rm ./get_helm.sh
-    
-    # install AWS and Elastic Beanstalk CLI Tools
-    # https://docs.aws.amazon.com/cli/latest/userguide/install-linux.html#install-linux-pip
-    pip install --upgrade awscli
-    pip install --upgrade awsebcli
 }
 
 # remove preinstalled apps
