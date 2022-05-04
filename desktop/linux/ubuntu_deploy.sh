@@ -28,6 +28,8 @@ ubuntu_apps(){
     sudo apt install -y cmatrix
     sudo apt install -y python3-pip
     sudo apt install -y npm
+    sudo apt install -y gimp
+    sudo apt install -y inkscape
     sudo apt install -y gnome-boxes
     sudo apt install -y gnome-sushi
     sudo apt install -y transmission
@@ -78,8 +80,6 @@ flatpak_apps(){
     sudo flatpak install -y flathub com.elsevier.MendeleyDesktop
     # sudo flatpak install -y flathub com.skype.Client
     sudo flatpak install -y flathub com.visualstudio.code
-    sudo flatpak install -y flathub org.inkscape.Inkscape
-    sudo flatpak install -y flathub org.gimp.GIMP
     sudo flatpak install -y flathub com.discordapp.Discord
 }
 
