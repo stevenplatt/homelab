@@ -12,11 +12,9 @@ repositories(){
 
 # install fedora repository utilities and apps
 fedora_apps(){
-    sudo dnf install -y transmission 
     sudo dnf install -y gnome-tweaks 
     sudo dnf install -y dnf-plugins-core 
-    sudo dnf install -y cmatrix 
-    sudo dnf install -y liveusb-creator 
+    sudo dnf install -y cmatrix
     sudo dnf install -y numix-icon-theme-circle 
     sudo dnf install -y papirus-icon-theme 
     sudo dnf install -y npm
@@ -29,6 +27,9 @@ fedora_apps(){
     sudo dnf install -y tlp
     sudo dnf install -y ansible
     sudo dnf install -y pitivi
+    sudo dnf install -y steam
+    sudo dnf install -y inkscape
+    sudo dnf install -y gimp
     }
     
 # install multimedia codecs from rpmfusion (required for pitivi and certain video playback)
@@ -50,23 +51,23 @@ python_apps(){
 # install flatpak apps
 flatpak_apps(){
     sudo flatpak install -y flathub com.elsevier.MendeleyDesktop 
-    sudo flatpak install -y flathub org.filezillaproject.Filezilla 
-    sudo flatpak install -y flathub com.obsproject.Studio 
-    sudo flatpak install -y flathub com.skype.Client
+    # sudo flatpak install -y flathub org.filezillaproject.Filezilla 
+    # sudo flatpak install -y flathub com.obsproject.Studio 
+    # sudo flatpak install -y flathub com.skype.Client
     sudo flatpak install -y flathub com.visualstudio.code 
-    sudo flatpak install -y flathub us.zoom.Zoom 
-    sudo flatpak install -y flathub com.valvesoftware.Steam 
-    sudo flatpak install -y flathub org.inkscape.Inkscape 
-    sudo flatpak install -y flathub org.gimp.GIMP 
+    sudo flatpak install -y flathub us.zoom.Zoom
     sudo flatpak install -y flathub com.discordapp.Discord
+    sudo flatpak install -y flathub com.google.Chrome
 }
 
 # install external apps
 external_apps(){
-    # install Google Chrome
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
-    sudo dnf install -y ./google-chrome-stable_current_x86_64.rpm
-    rm ./google-chrome-stable_current_x86_64.rpm
+    # install Docker
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh
+    rm get-docker.sh
+    sudo groupadd docker
+    sudo usermod -aG docker $USER
 }
 
 # remove preinstalled apps
