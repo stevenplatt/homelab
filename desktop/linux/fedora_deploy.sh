@@ -30,6 +30,8 @@ fedora_apps(){
     sudo dnf install -y steam
     sudo dnf install -y inkscape
     sudo dnf install -y gimp
+    # jq is installed already in stock fedora 36
+    # sudo dnf instal -y jq
     }
     
 # install multimedia codecs from rpmfusion (required for pitivi and certain video playback)
@@ -58,6 +60,7 @@ flatpak_apps(){
     sudo flatpak install -y flathub us.zoom.Zoom
     sudo flatpak install -y flathub com.discordapp.Discord
     sudo flatpak install -y flathub com.google.Chrome
+    sudo flatpak install -y flathub com.slack.Slack
 }
 
 # install external apps
@@ -68,6 +71,8 @@ external_apps(){
     rm get-docker.sh
     sudo groupadd docker
     sudo usermod -aG docker $USER
+    # install yarn for javascript builds
+    sudo npm install --global yarn
 }
 
 # remove preinstalled apps
