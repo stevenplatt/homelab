@@ -197,6 +197,10 @@ google_cloud_cli &> installation.log
 printf "Installing AWS CLI\n"
 aws_cli &> installation.log
 
+printf "Configuring Git\n"
+git config --global user.name "$(echo -n "U3RldmVuIFBsYXR0" | base64 --decode)"
+git config --global user.email "$(echo -n "bXIucGxhdHRAZ21haWwuY29t" | base64 --decode)"
+
 printf "Purging preinstalled applications\n"
 remove_apps &> installation.log
 disable_alerts &> installation.log
