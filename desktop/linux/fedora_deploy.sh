@@ -25,12 +25,14 @@ fedora_apps(){
     sudo dnf install -y python3-flask 
     sudo dnf install -y python-virtualenv 
     sudo dnf install -y neofetch 
-    sudo dnf install -y tlp
+    sudo dnf install -y powerline 
+    sudo dnf install -y powerline-fonts
     sudo dnf install -y ansible
     sudo dnf install -y pitivi
     sudo dnf install -y steam
     sudo dnf install -y inkscape
     sudo dnf install -y gimp
+    sudo dnf install -y snapd && sudo ln -s /var/lib/snapd/snap /snap
     sudo dnf install -y terraform
     yarn install --ignore-engines # for javascript builds
     # jq is installed already in stock fedora 36
@@ -51,6 +53,7 @@ python_apps(){
     sudo pip3 install flask-sqlalchemy 
     sudo pip3 install flask-login
     sudo pip3 install twine
+    sudo pip3 install psutil
     }
 
 # install flatpak apps
@@ -150,6 +153,43 @@ aws_cli(){
     # source: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html
 }
 
+# install and configura tools for proper laptop battery life control
+# source: https://www.tecmint.com/tlp-increase-and-optimize-linux-battery-life/
+power_management(){
+    # install and configure auto-cpufreq
+    # source: https://github.com/AdnanHodzic/auto-cpufreq
+    sudo snap install auto-cpufreq
+    sudo auto-cpufreq --install
+    git clone https://github.com/AdnanHodzic/auto-cpufreq.git
+    cd auto-cpufreq/auto_cpufreq
+    sudo python3 power_helper.py --gnome_power_disable performance
+    sudo python3 power_helper.py --gnome_power_disable balanced
+    cd ../../
+    rm -rf auto-cpufreq/
+}
+
+system_customization(){
+    # configure git user
+    git config --global user.name "$(echo -n "U3RldmVuIFBsYXR0" | base64 --decode)"
+    git config --global user.email "$(echo -n "bXIucGxhdHRAZ21haWwuY29t" | base64 --decode)"
+
+    # update dnf for faster downloads
+    # source: https://morioh.com/p/39ab4498b92d
+    sudo echo fastestmirror=1 | sudo tee -a /etc/dnf/dnf.conf
+    sudo echo max_parallel_downloads=10 | sudo tee -a /etc/dnf/dnf.conf
+
+    # enable powerline fonts in terminal
+    # source: https://fedoramagazine.org/add-power-terminal-powerline/
+    cat <> ~/.bashrc
+    if [ -f `which powerline-daemon` ]; then
+        powerline-daemon -q
+        POWERLINE_BASH_CONTINUATION=1
+        POWERLINE_BASH_SELECT=1
+        . /usr/share/powerline/bash/powerline.sh
+    fi
+    EOF
+}
+
 # remove preinstalled apps
 remove_apps(){
     sudo dnf remove -y rhythmbox* 
@@ -191,19 +231,15 @@ printf "Installing Flatpak applications\n"
 
 flatpak_apps &> installation.log
 
-printf "Installing Google Cloud CLI\n"
+printf "Installing CLI tools\n"
 google_cloud_cli &> installation.log
-
-printf "Installing AWS CLI\n"
 aws_cli &> installation.log
 
-printf "Configuring Git\n"
-git config --global user.name "$(echo -n "U3RldmVuIFBsYXR0" | base64 --decode)"
-git config --global user.email "$(echo -n "bXIucGxhdHRAZ21haWwuY29t" | base64 --decode)"
-
-printf "Purging preinstalled applications\n"
+printf "Applying system customizations\n"
+power_management &> installation.log
 remove_apps &> installation.log
 disable_alerts &> installation.log
+system_customization &> installation.log
 
 printf "\nUpdate complete. Rebooting system...\n\n"
 sleep 5
