@@ -96,16 +96,14 @@ google_cloud_cli(){
     # source: https://cloud.google.com/sdk/docs/install#rpm
 
     # update the google cloud repository
-    cat <> /etc/yum.repos.d/google-cloud-sdk.repo
-    [google-cloud-cli]
+    cat "[google-cloud-cli]
     name=Google Cloud CLI
     baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el8-x86_64
     enabled=1
     gpgcheck=1
     repo_gpgcheck=0
     gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
-           https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-    EOF
+           https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" >> /etc/yum.repos.d/google-cloud-sdk.repo
     
     # install google cloud cli dependencies
     sudo dnf install -y libxcrypt-compat.x86_64
@@ -180,14 +178,12 @@ system_customization(){
 
     # enable powerline fonts in terminal
     # source: https://fedoramagazine.org/add-power-terminal-powerline/
-    cat <> ~/.bashrc
-    if [ -f `which powerline-daemon` ]; then
-        powerline-daemon -q
-        POWERLINE_BASH_CONTINUATION=1
-        POWERLINE_BASH_SELECT=1
-        . /usr/share/powerline/bash/powerline.sh
-    fi
-    EOF
+    cat "if [ -f `which powerline-daemon` ]; then
+    powerline-daemon -q
+    POWERLINE_BASH_CONTINUATION=1
+    POWERLINE_BASH_SELECT=1
+    . /usr/share/powerline/bash/powerline.sh
+    fi" >> ~/.bashrc
 }
 
 # remove preinstalled apps
