@@ -209,6 +209,20 @@ disable_alerts(){
     sudo systemctl disable abrtd.service
 }
 
+create_swapfile(){
+    # create a swapfile required for hibernation to work
+    # source: https://superuser.com/questions/1067150/how-to-create-swapfile-on-ssd-disk-with-btrfs/1411462#1411462
+    # secondary source: https://gist.github.com/eloylp/b0d64d3c947dbfb23d13864e0c051c67
+    file='/swapfile'
+    sudo touch "$file"
+    sudo chattr +C "$file" # no copy-on-write
+    sudo dd if=/dev/zero of="$file" bs=1G count=40 # allocate 40 GB 
+    sudo chmod 600 "$file"
+    sudo mkswap "$file"
+    sudo chown root "$file"
+    sudo swapon "$file" # activate swapfile
+}
+
 ######### run installation script #########
 
 printf "\n\nLoading system customizations...\n"
