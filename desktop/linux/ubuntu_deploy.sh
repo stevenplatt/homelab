@@ -56,7 +56,9 @@ ubuntu_apps(){
     sudo apt install -y libbz2-dev
     sudo apt install -y awscli # run 'aws configure' after to input access key information
     sudo apt install -y jq # bash jason parser
+    sudo apt install -y kubectl
     
+    export KUBE_CONFIG_PATH=~/.kube/config # to allow terraform to find a local kubectl config
     npm install --global yarn # run 'yarn' and then 'yarn build' within the target js directory to activate
     
     # Install Google Cloud SDK's
