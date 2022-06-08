@@ -44,6 +44,7 @@ ubuntu_apps(){
     sudo apt install -y terraform
     sudo apt install -y docker.io #install docker from Ubuntu repository
     sudo apt install -y net-tools # install 'ifconfig' and other tools if not present
+    sudo apt install -y awscli # run 'aws configure' after to input access key information
     
     # Install additional developer dependencies -- specifically for AWS tools
     sudo apt install -y build-essential 
