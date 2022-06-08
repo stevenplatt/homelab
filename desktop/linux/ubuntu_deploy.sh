@@ -44,7 +44,6 @@ ubuntu_apps(){
     sudo apt install -y terraform
     sudo apt install -y docker.io #install docker from Ubuntu repository
     sudo apt install -y net-tools # install 'ifconfig' and other tools if not present
-    sudo apt install -y awscli # run 'aws configure' after to input access key information
     
     # Install additional developer dependencies -- specifically for AWS tools
     sudo apt install -y build-essential 
@@ -55,6 +54,10 @@ ubuntu_apps(){
     sudo apt install -y libsqlite3-dev 
     sudo apt install -y libreadline-dev 
     sudo apt install -y libbz2-dev
+    sudo apt install -y awscli # run 'aws configure' after to input access key information
+    sudo apt install -y jq # bash jason parser
+    
+    npm install --global yarn # run 'yarn' and then 'yarn build' within the target js directory to activate
     
     # Install Google Cloud SDK's
     # https://cloud.google.com/sdk/docs/install#deb
