@@ -74,17 +74,10 @@
       apt:
         name:
           - snapd
-          - gnome-tweaks
-          - cmatrix
           - python3-pip
           - python3-venv
           - pipx
           - npm
-          - gimp
-          - inkscape
-          - gnome-boxes
-          - gnome-sushi
-          - transmission-gtk
           - numix-icon-theme-circle
           - docker.io
           - docker-compose-v2
