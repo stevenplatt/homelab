@@ -22,8 +22,6 @@
   hosts: localhost
   connection: local
   become: true
-  vars:
-    kubernetes_version: v1.31
   tasks:
     - name: install prerequisite packages
       apt:
@@ -76,29 +74,6 @@
         filename: hashicorp
         state: present
 
-    - name: fetch kubernetes signing key
-      get_url:
-        url: "https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/Release.key"
-        dest: /tmp/kubernetes-release.key
-        mode: '0644'
-        force: true
-
-    - name: dearmor kubernetes signing key
-      shell: gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes.gpg /tmp/kubernetes-release.key
-      args:
-        creates: /etc/apt/keyrings/kubernetes.gpg
-
-    - name: set permissions on kubernetes signing key
-      file:
-        path: /etc/apt/keyrings/kubernetes.gpg
-        mode: '0644'
-
-    - name: add kubernetes repository
-      apt_repository:
-        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes.gpg] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/ /"
-        filename: kubernetes
-        state: present
-
     - name: fetch helm signing key
       get_url:
         url: https://baltocdn.com/helm/signing.asc
@@ -137,7 +112,6 @@
           - gnome-sushi
           - transmission-gtk
           - numix-icon-theme-circle
-          - kubectl
           - helm
           - terraform
           - docker.io
@@ -259,13 +233,19 @@
         path: /tmp/papirus-install.sh
         state: absent
 
-- name: install kind
+- name: install kubernetes tooling
   hosts: localhost
   connection: local
   become: true
   vars:
     kind_version: v0.25.0
   tasks:
+    - name: install kubectl snap
+      community.general.snap:
+        name: kubectl
+        classic: true
+        state: present
+
     - name: check if kind binary is installed
       stat:
         path: /usr/local/bin/kind
