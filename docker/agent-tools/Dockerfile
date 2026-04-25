@@ -22,9 +22,16 @@ RUN pip install --user --no-cache-dir \
         crewai-tools \
         openai
 
-RUN curl -fsSL https://agentstack.beeai.dev/install.sh -o /tmp/agentstack-install.sh \
-    && yes | sh /tmp/agentstack-install.sh \
-    && rm /tmp/agentstack-install.sh
+# install uv (manages its own Python toolchain) and use it to install the
+# agentstack CLI on a uv-managed Python 3.14. we skip the upstream install
+# script because it ends with `agentstack self install`, which tries to
+# bootstrap a docker/QEMU platform from inside the container and fails.
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && /home/agent/.local/bin/uv python install 3.14 \
+    && /home/agent/.local/bin/uv tool install \
+        --python=3.14 \
+        --with agentstack-sdk \
+        agentstack-cli
 
 WORKDIR /workspace
 
