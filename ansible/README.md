@@ -17,12 +17,26 @@ sudo apt install -y ansible
 ansible-galaxy collection install community.general
 ```
 
-## Running the playbook
+### Passwordless sudo (Ubuntu 25.10+)
 
-The playbook targets the local machine via [inventory.ini](inventory.ini), which pins `localhost` to the `local` connection. From inside the `ansible/` directory:
+Ubuntu 25.10 and 26.04 LTS replace classic `sudo` with `sudo-rs`, whose prompt format breaks ansible's interactive password handling (see [ansible#85837](https://github.com/ansible/ansible/issues/85837), fix pending in [PR #86175](https://github.com/ansible/ansible/pull/86175)). Until that fix ships, run ansible against a passwordless-sudo user:
 
 ```sh
-sudo ansible-playbook -i inventory.ini steel_legend.yml
+echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/99-ansible
+```
+
+Remove the file when you're done:
+
+```sh
+sudo rm /etc/sudoers.d/99-ansible
+```
+
+## Running the playbook
+
+The playbook targets the local machine via [inventory.ini](inventory.ini), which pins `localhost` to the `local` connection. With passwordless sudo in place, run from inside the `ansible/` directory:
+
+```sh
+ansible-playbook -i inventory.ini steel_legend.yml
 ```
 
 Flags:
