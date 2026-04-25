@@ -300,7 +300,7 @@
       changed_when: false
 
     - name: install agentstack
-      shell: 'sh -c "$(curl -LsSf https://agentstack.beeai.dev/install.sh)"'
+      shell: 'yes | sh -c "$(curl -LsSf https://agentstack.beeai.dev/install.sh)"'
       when: agentstack_check.rc != 0
 
     - name: register gemma3 as agentstack llm provider
