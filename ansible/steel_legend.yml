@@ -229,6 +229,21 @@
         mode: '0755'
       when: not kind_binary.stat.exists
 
+- name: remove legacy snaps replaced by the docker stack
+  hosts: localhost
+  connection: local
+  become: true
+  tasks:
+    - name: remove open-webui snap (now provided by docker compose)
+      community.general.snap:
+        name: open-webui
+        state: absent
+
+    - name: remove gemma3 snap (replaced by lemonade in docker compose)
+      community.general.snap:
+        name: gemma3
+        state: absent
+
 - name: docker host setup for vllm and gpu passthrough
   hosts: localhost
   connection: local
