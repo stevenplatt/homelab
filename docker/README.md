@@ -23,12 +23,9 @@ The Ansible playbook ([../ansible/steel_legend.yml](../ansible/steel_legend.yml)
 
 After running the playbook, **log out and back in** so the new group memberships take effect — otherwise `docker` commands will fail with permission denied.
 
-For gated Hugging Face models, you'll also need a [Hugging Face access token](https://huggingface.co/settings/tokens) and to accept the model's license on its HF page.
-
 ## Setup
 
 ```sh
-cp .env.example .env          # edit .env, set HF_TOKEN if needed
 mkdir -p workspace
 docker compose pull
 docker compose up -d
@@ -73,13 +70,13 @@ Drop your CrewAI / AgentStack project files into the `./workspace` directory on 
 
 ## Configuration
 
-All knobs live in `.env`:
+All knobs are inlined directly in [docker-compose.yml](docker-compose.yml) — there is no `.env` file. Edit the YAML and `docker compose up -d` to apply.
 
-| Variable | Default | What it does |
-| --- | --- | --- |
-| `HF_TOKEN` | _empty_ | Hugging Face token for gated/private model pulls |
-| `LEMONADE_MODEL` | `Gemma-4-31B-it-GGUF` | Default model name used by `agent-tools` (must match what you've pulled) |
-| `WEBUI_AUTH` | `False` | Toggle Open WebUI login flow |
+| Service | Key | Default | What it does |
+| --- | --- | --- | --- |
+| `agent-tools` | `OPENAI_MODEL_NAME` | `Gemma-4-31B-it-GGUF` | Model name `agent-tools` calls (must match what you've pulled) |
+| `open-webui` | `WEBUI_AUTH` | `False` | Toggle Open WebUI login flow |
+| `open-webui` / `agent-tools` | `OPENAI_API_BASE_URL` / `OPENAI_API_BASE` | `http://lemonade:13305/v1` | Backend endpoint |
 
 ## Models
 

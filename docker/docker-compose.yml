@@ -12,8 +12,6 @@ services:
     group_add:
       - video
       - render
-    environment:
-      - HF_TOKEN=${HF_TOKEN:-}
     healthcheck:
       test: ["CMD-SHELL", "curl -fs http://localhost:13305/live || exit 1"]
       interval: 30s
@@ -32,7 +30,7 @@ services:
     environment:
       - OPENAI_API_BASE_URL=http://lemonade:13305/v1
       - OPENAI_API_KEY=local
-      - WEBUI_AUTH=${WEBUI_AUTH:-False}
+      - WEBUI_AUTH=False
     depends_on:
       lemonade:
         condition: service_healthy
@@ -47,7 +45,7 @@ services:
     environment:
       - OPENAI_API_BASE=http://lemonade:13305/v1
       - OPENAI_API_KEY=local
-      - OPENAI_MODEL_NAME=${LEMONADE_MODEL:-Gemma-4-31B-it-GGUF}
+      - OPENAI_MODEL_NAME=Gemma-4-31B-it-GGUF
     tty: true
     stdin_open: true
     depends_on:
