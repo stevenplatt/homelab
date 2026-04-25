@@ -3,16 +3,6 @@
 # minimal smoke test — confirms ansible can reach the host and run a task.
 # uncomment the plays below once this passes.
 
-- name: smoke test
-  hosts: all
-  gather_facts: false
-  tasks:
-    - name: ping
-      ansible.builtin.ping:
-
-    - name: confirm ansible is working
-      ansible.builtin.debug:
-        msg: "ansible reached {{ inventory_hostname }} successfully"
 
 # # performs a full configuration of a cleanly installed ubuntu operating system
 # # targets Ubuntu 26.04 LTS
