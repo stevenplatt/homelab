@@ -50,3 +50,6 @@ kubernetes_storage_2
 
 [fedora_workstation]
 10.0.5.10
+
+[ubuntu_workstation]
+10.0.5.11
