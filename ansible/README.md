@@ -22,11 +22,10 @@ ansible-galaxy collection install community.general
 The playbook targets the local machine via [inventory.ini](inventory.ini), which pins `localhost` to the `local` connection. From inside the `ansible/` directory:
 
 ```sh
-ansible-playbook -i inventory.ini steel_legend.yml -K
+sudo ansible-playbook -i inventory.ini steel_legend.yml
 ```
 
 Flags:
 
 - `-i inventory.ini` — inventory file (`localhost` with `ansible_connection=local`).
-- `-K` — prompt for the sudo password.
 - `--check` — dry run; show what would change without applying.

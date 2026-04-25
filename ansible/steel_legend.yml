@@ -72,7 +72,7 @@
 
     - name: add hashicorp (terraform) repository
       apt_repository:
-        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.asc] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.asc] https://apt.releases.hashicorp.com noble main"
         filename: hashicorp
         state: present
 
