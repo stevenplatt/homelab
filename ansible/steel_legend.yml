@@ -252,6 +252,7 @@
     - name: install gemma3 inference snap
       community.general.snap:
         name: gemma3
+        channel: beta
         state: present
 
     - name: install open-webui snap
