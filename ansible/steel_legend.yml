@@ -79,13 +79,23 @@
     - name: fetch kubernetes signing key
       get_url:
         url: "https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/Release.key"
-        dest: /etc/apt/keyrings/kubernetes.asc
+        dest: /tmp/kubernetes-release.key
         mode: '0644'
         force: true
 
+    - name: dearmor kubernetes signing key
+      shell: gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes.gpg /tmp/kubernetes-release.key
+      args:
+        creates: /etc/apt/keyrings/kubernetes.gpg
+
+    - name: set permissions on kubernetes signing key
+      file:
+        path: /etc/apt/keyrings/kubernetes.gpg
+        mode: '0644'
+
     - name: add kubernetes repository
       apt_repository:
-        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes.asc] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/ /"
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes.gpg] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/ /"
         filename: kubernetes
         state: present
 
