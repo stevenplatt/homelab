@@ -41,7 +41,7 @@ services:
     container_name: agent-tools
     volumes:
       - ./workspace:/workspace
-      - agent-tools-home:/root
+      - agent-tools-home:/home/agent
     environment:
       - OPENAI_API_BASE=http://lemonade:13305/v1
       - OPENAI_API_KEY=local

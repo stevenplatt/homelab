@@ -1,7 +1,6 @@
 FROM python:3.12-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV PATH="/root/.local/bin:${PATH}"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
@@ -10,7 +9,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir \
+# match the typical first-user uid/gid on a desktop Ubuntu host so
+# bind-mounted ./workspace has matching ownership.
+RUN groupadd -g 1000 agent && useradd -m -u 1000 -g 1000 -s /bin/bash agent
+
+USER agent
+WORKDIR /home/agent
+ENV PATH="/home/agent/.local/bin:${PATH}"
+
+RUN pip install --user --no-cache-dir \
         crewai \
         crewai-tools \
         openai

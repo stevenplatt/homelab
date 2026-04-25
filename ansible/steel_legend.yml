@@ -235,7 +235,12 @@
   tasks:
     - name: capture target user
       set_fact:
-        target_user: "{{ ansible_user_id }}"
+        target_user: "{{ ansible_env.SUDO_USER | default(ansible_user_id, true) }}"
+
+    - name: fail if target user resolved to root
+      fail:
+        msg: "target_user resolved to root — run the playbook as your normal user (with passwordless sudo) or with `sudo -E -u <user>`, not as root directly."
+      when: target_user == "root"
 
     - name: install rocm-smi for amd gpu diagnostics
       become: true
