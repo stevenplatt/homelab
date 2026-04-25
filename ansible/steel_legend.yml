@@ -3,98 +3,109 @@
 # minimal smoke test — confirms ansible can reach the host and run a task.
 # uncomment the plays below once this passes.
 
+- name: smoke test
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: ping
+      ansible.builtin.ping:
 
-# # performs a full configuration of a cleanly installed ubuntu operating system
-# # targets Ubuntu 26.04 LTS
-#
-# - name: enable third party repositories
-#   hosts: localhost
-#   connection: local
-#   become: true
-#   vars:
-#     kubernetes_version: v1.31
-#   tasks:
-#     - name: install prerequisite packages
-#       apt:
-#         name:
-#           - curl
-#           - flatpak
-#           - apt-transport-https
-#           - ca-certificates
-#           - gnupg
-#           - lsb-release
-#           - software-properties-common
-#         state: present
-#         update_cache: true
-#
-#     - name: ensure /etc/apt/keyrings exists
-#       file:
-#         path: /etc/apt/keyrings
-#         state: directory
-#         mode: '0755'
-#
-#     - name: add flathub flatpak repository
-#       community.general.flatpak_remote:
-#         name: flathub
-#         flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
-#         state: present
-#
-#     - name: fetch google cloud sdk signing key
-#       get_url:
-#         url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-#         dest: /etc/apt/keyrings/cloud.google.asc
-#         mode: '0644'
-#         force: true
-#
-#     - name: add google cloud sdk repository
-#       apt_repository:
-#         repo: "deb [signed-by=/etc/apt/keyrings/cloud.google.asc] https://packages.cloud.google.com/apt cloud-sdk main"
-#         filename: google-cloud-sdk
-#         state: present
-#
-#     - name: fetch hashicorp signing key
-#       get_url:
-#         url: https://apt.releases.hashicorp.com/gpg
-#         dest: /etc/apt/keyrings/hashicorp.asc
-#         mode: '0644'
-#         force: true
-#
-#     - name: add hashicorp (terraform) repository
-#       apt_repository:
-#         repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.asc] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
-#         filename: hashicorp
-#         state: present
-#
-#     - name: fetch kubernetes signing key
-#       get_url:
-#         url: "https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/Release.key"
-#         dest: /etc/apt/keyrings/kubernetes.asc
-#         mode: '0644'
-#         force: true
-#
-#     - name: add kubernetes repository
-#       apt_repository:
-#         repo: "deb [signed-by=/etc/apt/keyrings/kubernetes.asc] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/ /"
-#         filename: kubernetes
-#         state: present
-#
-#     - name: fetch helm signing key
-#       get_url:
-#         url: https://baltocdn.com/helm/signing.asc
-#         dest: /etc/apt/keyrings/helm.asc
-#         mode: '0644'
-#         force: true
-#
-#     - name: add helm repository
-#       apt_repository:
-#         repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.asc] https://baltocdn.com/helm/stable/debian/ all main"
-#         filename: helm-stable-debian
-#         state: present
-#
-#     - name: update apt cache after adding repositories
-#       apt:
-#         update_cache: true
-#
+    - name: confirm ansible is working
+      ansible.builtin.debug:
+        msg: "ansible reached {{ inventory_hostname }} successfully"
+
+# performs a full configuration of a cleanly installed ubuntu operating system
+# targets Ubuntu 26.04 LTS
+
+- name: enable third party repositories
+  hosts: localhost
+  connection: local
+  become: true
+  vars:
+    kubernetes_version: v1.31
+  tasks:
+    - name: install prerequisite packages
+      apt:
+        name:
+          - curl
+          - flatpak
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+          - lsb-release
+          - software-properties-common
+        state: present
+        update_cache: true
+
+    - name: ensure /etc/apt/keyrings exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: add flathub flatpak repository
+      community.general.flatpak_remote:
+        name: flathub
+        flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+        state: present
+
+    - name: fetch google cloud sdk signing key
+      get_url:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        dest: /etc/apt/keyrings/cloud.google.asc
+        mode: '0644'
+        force: true
+
+    - name: add google cloud sdk repository
+      apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/cloud.google.asc] https://packages.cloud.google.com/apt cloud-sdk main"
+        filename: google-cloud-sdk
+        state: present
+
+    - name: fetch hashicorp signing key
+      get_url:
+        url: https://apt.releases.hashicorp.com/gpg
+        dest: /etc/apt/keyrings/hashicorp.asc
+        mode: '0644'
+        force: true
+
+    - name: add hashicorp (terraform) repository
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.asc] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+        filename: hashicorp
+        state: present
+
+    - name: fetch kubernetes signing key
+      get_url:
+        url: "https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/Release.key"
+        dest: /etc/apt/keyrings/kubernetes.asc
+        mode: '0644'
+        force: true
+
+    - name: add kubernetes repository
+      apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes.asc] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/ /"
+        filename: kubernetes
+        state: present
+
+    - name: fetch helm signing key
+      get_url:
+        url: https://baltocdn.com/helm/signing.asc
+        dest: /etc/apt/keyrings/helm.asc
+        mode: '0644'
+        force: true
+
+    - name: add helm repository
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.asc] https://baltocdn.com/helm/stable/debian/ all main"
+        filename: helm-stable-debian
+        state: present
+
+    - name: update apt cache after adding repositories
+      apt:
+        update_cache: true
+
 - name: install apt applications
   hosts: localhost
   connection: local
