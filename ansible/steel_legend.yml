@@ -253,9 +253,13 @@
         groups: docker,render,video
         append: true
 
-    - name: ensure docker service is running
+    - name: enable and start docker stack at boot
       become: true
       systemd:
-        name: docker
+        name: "{{ item }}"
         state: started
         enabled: true
+      loop:
+        - containerd.service
+        - docker.socket
+        - docker.service
