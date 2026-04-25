@@ -8,7 +8,8 @@
 # # targets Ubuntu 26.04 LTS
 #
 # - name: enable third party repositories
-#   hosts: all
+#   hosts: localhost
+#   connection: local
 #   become: true
 #   vars:
 #     kubernetes_version: v1.31
@@ -151,7 +152,8 @@
         state: present
 
 - name: install aws cli v2
-  hosts: all
+  hosts: localhost
+  connection: local
   become: true
   tasks:
     - name: check if aws cli is installed
@@ -187,7 +189,8 @@
         - /tmp/aws
 
 - name: install flatpak applications
-  hosts: all
+  hosts: localhost
+  connection: local
   become: true
   tasks:
     - name: application installs
@@ -202,7 +205,8 @@
         - com.valvesoftware.Steam
 
 - name: install third party applications
-  hosts: all
+  hosts: localhost
+  connection: local
   become: true
   tasks:
     - name: download google chrome deb package
@@ -236,7 +240,8 @@
         state: absent
 
 - name: install kind
-  hosts: all
+  hosts: localhost
+  connection: local
   become: true
   vars:
     kind_version: v0.25.0
@@ -254,7 +259,8 @@
       when: not kind_binary.stat.exists
 
 - name: install inference snaps
-  hosts: all
+  hosts: localhost
+  connection: local
   become: true
   tasks:
     - name: install gemma3 inference snap
@@ -268,7 +274,8 @@
         state: present
 
 - name: install agentstack and wire up local gemma3 model
-  hosts: all
+  hosts: localhost
+  connection: local
   vars:
     gemma3_port: 9090
     gemma3_base_url: "http://127.0.0.1:9090/v1"
@@ -322,7 +329,8 @@
       failed_when: false
 
 - name: reboot system
-  hosts: all
+  hosts: localhost
+  connection: local
   become: true
   tasks:
     - name: reboot
