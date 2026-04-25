@@ -158,9 +158,7 @@
         remote: flathub
         state: present
       loop:
-        - us.zoom.Zoom
-        - com.visualstudio.code
-        - com.discordapp.Discord
+      # required to avoid conflict with inference snap gpu configs
         - com.valvesoftware.Steam
 
 - name: install third party applications
@@ -197,6 +195,26 @@
       file:
         path: /tmp/papirus-install.sh
         state: absent
+
+- name: install desktop snaps
+  hosts: localhost
+  connection: local
+  become: true
+  tasks:
+    - name: install classic-confinement desktop snaps
+      community.general.snap:
+        name:
+          - slack
+          - code
+        classic: true
+        state: present
+
+    - name: install strict-confinement desktop snaps
+      community.general.snap:
+        name:
+          - zoom-client
+          - discord
+        state: present
 
 - name: install devops tooling
   hosts: localhost
