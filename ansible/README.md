@@ -7,7 +7,7 @@ Playbooks for provisioning workstations and homelab hosts.
 | File | Target | Purpose |
 | --- | --- | --- |
 | [fedora_deploy.yml](fedora_deploy.yml) | `fedora_workstation` | Full setup of a fresh Fedora workstation. |
-| [ubuntu_deploy.yml](ubuntu_deploy.yml) | `ubuntu_workstation` | Full setup of a fresh Ubuntu 26.04 LTS workstation. Installs `kind` and bootstraps a local cluster as the active kubecontext (`kind-homelab`). |
+| [ubuntu_deploy.yml](ubuntu_deploy.yml) | `ubuntu_workstation` | Full setup of a fresh Ubuntu 26.04 LTS workstation. |
 
 Inventory lives in [_hosts.txt](_hosts.txt). Update the IPs under the relevant group before running.
 

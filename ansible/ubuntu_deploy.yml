@@ -230,62 +230,37 @@
         path: /tmp/papirus-install.sh
         state: absent
 
-- name: install kind and bootstrap local cluster
+- name: install kind
   hosts: ubuntu_workstation
+  become: true
   vars:
     kind_version: v0.25.0
-    kind_cluster_name: homelab
   tasks:
-    - name: capture target user
-      set_fact:
-        target_user: "{{ ansible_user_id }}"
-        target_home: "{{ ansible_env.HOME }}"
-
     - name: check if kind binary is installed
       stat:
         path: /usr/local/bin/kind
       register: kind_binary
 
     - name: download kind binary
-      become: true
       get_url:
         url: "https://kind.sigs.k8s.io/dl/{{ kind_version }}/kind-linux-amd64"
         dest: /usr/local/bin/kind
         mode: '0755'
       when: not kind_binary.stat.exists
 
-    - name: ensure docker service is running
-      become: true
-      service:
-        name: docker
-        state: started
-        enabled: true
+- name: install inference snaps
+  hosts: ubuntu_workstation
+  become: true
+  tasks:
+    - name: install gemma3 inference snap
+      community.general.snap:
+        name: gemma3
+        state: present
 
-    - name: add target user to docker group
-      become: true
-      user:
-        name: "{{ target_user }}"
-        groups: docker
-        append: true
-
-    - name: ensure ~/.kube directory exists
-      file:
-        path: "{{ target_home }}/.kube"
-        state: directory
-        mode: '0755'
-
-    - name: list existing kind clusters
-      shell: "sg docker -c 'kind get clusters'"
-      register: kind_clusters
-      changed_when: false
-
-    - name: create kind cluster
-      shell: "sg docker -c 'kind create cluster --name {{ kind_cluster_name }}'"
-      when: kind_cluster_name not in kind_clusters.stdout_lines
-
-    - name: set current kubecontext to kind cluster
-      command: "kubectl config use-context kind-{{ kind_cluster_name }}"
-      changed_when: false
+    - name: install open-webui snap
+      community.general.snap:
+        name: open-webui
+        state: present
 
 - name: reboot system
   hosts: ubuntu_workstation
