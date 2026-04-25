@@ -61,32 +61,6 @@
         filename: google-cloud-sdk
         state: present
 
-    - name: fetch hashicorp signing key
-      get_url:
-        url: https://apt.releases.hashicorp.com/gpg
-        dest: /etc/apt/keyrings/hashicorp.asc
-        mode: '0644'
-        force: true
-
-    - name: add hashicorp (terraform) repository
-      apt_repository:
-        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.asc] https://apt.releases.hashicorp.com noble main"
-        filename: hashicorp
-        state: present
-
-    - name: fetch helm signing key
-      get_url:
-        url: https://baltocdn.com/helm/signing.asc
-        dest: /etc/apt/keyrings/helm.asc
-        mode: '0644'
-        force: true
-
-    - name: add helm repository
-      apt_repository:
-        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.asc] https://baltocdn.com/helm/stable/debian/ all main"
-        filename: helm-stable-debian
-        state: present
-
     - name: update apt cache after adding repositories
       apt:
         update_cache: true
@@ -112,8 +86,6 @@
           - gnome-sushi
           - transmission-gtk
           - numix-icon-theme-circle
-          - helm
-          - terraform
           - docker.io
           - docker-compose-v2
           - net-tools
@@ -233,16 +205,19 @@
         path: /tmp/papirus-install.sh
         state: absent
 
-- name: install kubernetes tooling
+- name: install devops tooling
   hosts: localhost
   connection: local
   become: true
   vars:
     kind_version: v0.25.0
   tasks:
-    - name: install kubectl snap
+    - name: install classic-confinement devops snaps
       community.general.snap:
-        name: kubectl
+        name:
+          - kubectl
+          - helm
+          - terraform
         classic: true
         state: present
 
