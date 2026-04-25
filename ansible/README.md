@@ -19,15 +19,14 @@ ansible-galaxy collection install community.general
 
 ## Running the playbook
 
-The playbook is intended to run against the local machine. From inside the `ansible/` directory:
+The playbook targets the local machine via [inventory.ini](inventory.ini), which pins `localhost` to the `local` connection. From inside the `ansible/` directory:
 
 ```sh
-ansible-playbook -i 'localhost,' -c local steel_legend.yml -K
+ansible-playbook -i inventory.ini steel_legend.yml -K
 ```
 
 Flags:
 
-- `-i 'localhost,'` — inline inventory of one host (the trailing comma is required).
-- `-c local` — use the local connection instead of SSH.
+- `-i inventory.ini` — inventory file (`localhost` with `ansible_connection=local`).
 - `-K` — prompt for the sudo password.
 - `--check` — dry run; show what would change without applying.
