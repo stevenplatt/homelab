@@ -251,6 +251,7 @@
 - name: install agentstack and wire up local gemma3 model
   hosts: localhost
   connection: local
+  become: false
   vars:
     gemma3_port: 9090
     gemma3_base_url: "http://127.0.0.1:9090/v1"
