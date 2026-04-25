@@ -104,60 +104,60 @@
 #       apt:
 #         update_cache: true
 #
-# - name: install apt applications
-#   hosts: all
-#   become: true
-#   tasks:
-#     - name: install desktop and developer packages
-#       apt:
-#         name:
-#           - snapd
-#           - gnome-tweaks
-#           - cmatrix
-#           - python3-pip
-#           - python3-venv
-#           - pipx
-#           - npm
-#           - gimp
-#           - inkscape
-#           - gnome-boxes
-#           - gnome-sushi
-#           - transmission-gtk
-#           - neofetch
-#           - numix-icon-theme-circle
-#           - kubectl
-#           - helm
-#           - terraform
-#           - docker.io
-#           - docker-compose-v2
-#           - net-tools
-#           - build-essential
-#           - zlib1g-dev
-#           - libssl-dev
-#           - libncurses-dev
-#           - libffi-dev
-#           - libsqlite3-dev
-#           - libreadline-dev
-#           - libbz2-dev
-#           - jq
-#           - unzip
-#           - google-cloud-cli
-#           - google-cloud-cli-app-engine-python
-#           - google-cloud-cli-app-engine-python-extras
-#           - google-cloud-cli-app-engine-go
-#           - google-cloud-cli-bigtable-emulator
-#           - google-cloud-cli-cbt
-#           - google-cloud-cli-cloud-build-local
-#           - google-cloud-cli-datastore-emulator
-#           - google-cloud-cli-firestore-emulator
-#           - google-cloud-cli-pubsub-emulator
-#         state: present
-#
-#     - name: install yarn globally via npm
-#       community.general.npm:
-#         name: yarn
-#         global: true
-#         state: present
+- name: install apt applications
+  hosts: all
+  become: true
+  tasks:
+    - name: install desktop and developer packages
+      apt:
+        name:
+          - snapd
+          - gnome-tweaks
+          - cmatrix
+          - python3-pip
+          - python3-venv
+          - pipx
+          - npm
+          - gimp
+          - inkscape
+          - gnome-boxes
+          - gnome-sushi
+          - transmission-gtk
+          - neofetch
+          - numix-icon-theme-circle
+          - kubectl
+          - helm
+          - terraform
+          - docker.io
+          - docker-compose-v2
+          - net-tools
+          - build-essential
+          - zlib1g-dev
+          - libssl-dev
+          - libncurses-dev
+          - libffi-dev
+          - libsqlite3-dev
+          - libreadline-dev
+          - libbz2-dev
+          - jq
+          - unzip
+          - google-cloud-cli
+          - google-cloud-cli-app-engine-python
+          - google-cloud-cli-app-engine-python-extras
+          - google-cloud-cli-app-engine-go
+          - google-cloud-cli-bigtable-emulator
+          - google-cloud-cli-cbt
+          - google-cloud-cli-cloud-build-local
+          - google-cloud-cli-datastore-emulator
+          - google-cloud-cli-firestore-emulator
+          - google-cloud-cli-pubsub-emulator
+        state: present
+
+    - name: install yarn globally via npm
+      community.general.npm:
+        name: yarn
+        global: true
+        state: present
 #
 # - name: install aws cli v2
 #   hosts: all
