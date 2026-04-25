@@ -252,7 +252,6 @@
     - name: install gemma3 inference snap
       community.general.snap:
         name: gemma3
-        channel: beta
         state: present
 
     - name: install open-webui snap
@@ -273,6 +272,7 @@
         target_home: "{{ ansible_env.HOME }}"
 
     - name: pin gemma3 http port
+      become: true
       command: "gemma3 set http.port={{ gemma3_port }}"
       changed_when: false
 
