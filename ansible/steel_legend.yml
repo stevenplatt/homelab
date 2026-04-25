@@ -229,96 +229,33 @@
         mode: '0755'
       when: not kind_binary.stat.exists
 
-- name: install inference snaps
+- name: docker host setup for vllm and gpu passthrough
   hosts: localhost
   connection: local
-  become: true
-  vars:
-    gemma3_engine: amd-gpu
-    gemma3_engine_component: llamacpp-rocm
   tasks:
-    - name: install gemma3 inference snap
-      community.general.snap:
-        name: gemma3
-        state: present
-
-    - name: list installed gemma3 components
-      command: snap components gemma3
-      register: gemma3_components
-      changed_when: false
-      failed_when: false
-
-    - name: install gemma3 engine component
-      command: "snap install gemma3+{{ gemma3_engine_component }}"
-      when: gemma3_engine_component not in gemma3_components.stdout
-
-    - name: show current gemma3 engine
-      command: gemma3 show-engine
-      register: gemma3_show_engine
-      changed_when: false
-
-    - name: switch gemma3 active engine
-      command: "gemma3 use-engine {{ gemma3_engine }}"
-      when: gemma3_engine not in gemma3_show_engine.stdout
-
-    - name: install open-webui snap
-      community.general.snap:
-        name: open-webui
-        state: present
-
-- name: install agentstack and wire up local gemma3 model
-  hosts: localhost
-  connection: local
-  become: false
-  vars:
-    gemma3_port: 9090
-    gemma3_base_url: "http://127.0.0.1:9090/v1"
-  tasks:
-    - name: capture target user and home
+    - name: capture target user
       set_fact:
-        target_home: "{{ ansible_env.HOME }}"
+        target_user: "{{ ansible_user_id }}"
 
-    - name: pin gemma3 http port
+    - name: install rocm-smi for amd gpu diagnostics
       become: true
-      command: "gemma3 set http.port={{ gemma3_port }}"
-      changed_when: false
+      apt:
+        name:
+          - rocm-smi
+          - rocminfo
+        state: present
+      failed_when: false
 
-    - name: restart gemma3 snap
+    - name: add user to docker, render, video groups
       become: true
-      command: snap restart gemma3
+      user:
+        name: "{{ target_user }}"
+        groups: docker,render,video
+        append: true
 
-    - name: wait for gemma3 openai endpoint
-      uri:
-        url: "{{ gemma3_base_url }}/models"
-        status_code: 200
-      register: gemma3_models
-      retries: 60
-      delay: 5
-      until: gemma3_models.status == 200
-
-    - name: capture default gemma3 model id
-      set_fact:
-        gemma3_model_id: "{{ gemma3_models.json.data[0].id }}"
-
-    - name: check if agentstack is installed
-      command: which agentstack
-      register: agentstack_check
-      failed_when: false
-      changed_when: false
-
-    - name: install agentstack
-      shell: 'yes | sh -c "$(curl -LsSf https://agentstack.beeai.dev/install.sh)"'
-      when: agentstack_check.rc != 0
-
-    - name: register gemma3 as agentstack llm provider
-      shell: |
-        export PATH="{{ target_home }}/.local/bin:$PATH"
-        agentstack model add llm \
-          --provider openai \
-          --base-url {{ gemma3_base_url }} \
-          --api-key local \
-          --model "{{ gemma3_model_id }}" \
-          --yes
-      register: agentstack_model_add
-      changed_when: agentstack_model_add.rc == 0
-      failed_when: false
+    - name: ensure docker service is running
+      become: true
+      systemd:
+        name: docker
+        state: started
+        enabled: true

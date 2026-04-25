@@ -1,0 +1,62 @@
+services:
+  lemonade:
+    image: ghcr.io/lemonade-sdk/lemonade-server:latest
+    container_name: lemonade
+    ports:
+      - "13305:13305"
+    volumes:
+      - lemonade-cache:/root/.cache/huggingface
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    group_add:
+      - video
+      - render
+    environment:
+      - HF_TOKEN=${HF_TOKEN:-}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:13305/live || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
+    restart: unless-stopped
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui-data:/app/backend/data
+    environment:
+      - OPENAI_API_BASE_URL=http://lemonade:13305/v1
+      - OPENAI_API_KEY=local
+      - WEBUI_AUTH=${WEBUI_AUTH:-False}
+    depends_on:
+      lemonade:
+        condition: service_healthy
+    restart: unless-stopped
+
+  agent-tools:
+    build: ./agent-tools
+    container_name: agent-tools
+    volumes:
+      - ./workspace:/workspace
+      - agent-tools-home:/root
+    environment:
+      - OPENAI_API_BASE=http://lemonade:13305/v1
+      - OPENAI_API_KEY=local
+      - OPENAI_MODEL_NAME=${LEMONADE_MODEL:-Gemma-4-31B-it-GGUF}
+    tty: true
+    stdin_open: true
+    depends_on:
+      lemonade:
+        condition: service_healthy
+    command: ["sleep", "infinity"]
+    restart: unless-stopped
+
+volumes:
+  lemonade-cache:
+  open-webui-data:
+  agent-tools-home:
