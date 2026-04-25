@@ -315,11 +315,3 @@
       register: agentstack_model_add
       changed_when: agentstack_model_add.rc == 0
       failed_when: false
-
-- name: reboot system
-  hosts: localhost
-  connection: local
-  become: true
-  tasks:
-    - name: reboot
-      reboot:
