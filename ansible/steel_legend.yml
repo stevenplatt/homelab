@@ -4,7 +4,7 @@
 # targets Ubuntu 26.04 LTS
 
 - name: enable third party repositories
-  hosts: ubuntu_workstation
+  hosts: all
   become: true
   vars:
     kubernetes_version: v1.31
@@ -91,7 +91,7 @@
         update_cache: true
 
 - name: install apt applications
-  hosts: ubuntu_workstation
+  hosts: all
   become: true
   tasks:
     - name: install desktop and developer packages
@@ -146,7 +146,7 @@
         state: present
 
 - name: install aws cli v2
-  hosts: ubuntu_workstation
+  hosts: all
   become: true
   tasks:
     - name: check if aws cli is installed
@@ -182,7 +182,7 @@
         - /tmp/aws
 
 - name: install flatpak applications
-  hosts: ubuntu_workstation
+  hosts: all
   become: true
   tasks:
     - name: application installs
@@ -197,7 +197,7 @@
         - com.valvesoftware.Steam
 
 - name: install third party applications
-  hosts: ubuntu_workstation
+  hosts: all
   become: true
   tasks:
     - name: download google chrome deb package
@@ -231,7 +231,7 @@
         state: absent
 
 - name: install kind
-  hosts: ubuntu_workstation
+  hosts: all
   become: true
   vars:
     kind_version: v0.25.0
@@ -249,7 +249,7 @@
       when: not kind_binary.stat.exists
 
 - name: install inference snaps
-  hosts: ubuntu_workstation
+  hosts: all
   become: true
   tasks:
     - name: install gemma3 inference snap
@@ -263,7 +263,7 @@
         state: present
 
 - name: reboot system
-  hosts: ubuntu_workstation
+  hosts: all
   become: true
   tasks:
     - name: reboot
