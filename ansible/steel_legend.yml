@@ -251,6 +251,15 @@
         state: present
       failed_when: false
 
+    - name: ensure gpu access groups exist
+      become: true
+      group:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - render
+        - video
+
     - name: add user to docker, render, video groups
       become: true
       user:
