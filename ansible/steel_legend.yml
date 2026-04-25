@@ -107,7 +107,6 @@
 - name: install apt applications
   hosts: all
   become: true
-  gather_facts: false
   tasks:
     - name: install desktop and developer packages
       apt:
