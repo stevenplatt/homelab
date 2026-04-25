@@ -92,7 +92,15 @@ See the [Lemonade CLI guide](https://lemonade-server.ai/docs/lemonade-cli/) for 
 
 ## GPU notes
 
-The compose file passes `/dev/kfd` and `/dev/dri` into the container and joins the host `render`/`video` groups. Lemonade's bundled ROCm 7 handles the rest. Supported architectures (per [llamacpp-rocm releases](https://github.com/lemonade-sdk/llamacpp-rocm/releases)):
+The compose file passes `/dev/kfd` and `/dev/dri` into the container and joins the host `render`/`video` groups via numeric GIDs (docker resolves group *names* against the container's `/etc/group`, not the host's, so names always fail with `unable to find group: no matching entries in group file`). Confirm the GIDs on your host:
+
+```sh
+getent group video  | cut -d: -f3   # almost always 44
+getent group render | cut -d: -f3   # varies — 109, 110, 992, etc.
+```
+
+If yours differ from `44` / `110`, edit `group_add` in [docker-compose.yml](docker-compose.yml) accordingly.
+ Lemonade's bundled ROCm 7 handles the rest. Supported architectures (per [llamacpp-rocm releases](https://github.com/lemonade-sdk/llamacpp-rocm/releases)):
 
 | Architecture | Cards |
 | --- | --- |

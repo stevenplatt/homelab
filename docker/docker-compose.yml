@@ -9,9 +9,12 @@ services:
     devices:
       - /dev/kfd
       - /dev/dri
+    # numeric GIDs, not names: docker resolves names against the container's
+    # /etc/group (not the host's), so the names always fail. confirm with
+    # `getent group video` and `getent group render` on the host and adjust.
     group_add:
-      - video
-      - render
+      - "44"   # video
+      - "990"  # render
     healthcheck:
       test: ["CMD-SHELL", "curl -fs http://localhost:13305/live || exit 1"]
       interval: 30s
