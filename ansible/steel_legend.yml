@@ -78,7 +78,6 @@
           - python3-venv
           - pipx
           - npm
-          - numix-icon-theme-circle
           - docker.io
           - docker-compose-v2
           - net-tools
@@ -182,20 +181,6 @@
         path: /tmp/google-chrome-stable_current_amd64.deb
         state: absent
 
-    - name: download papirus icon theme installer
-      get_url:
-        url: https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install.sh
-        dest: /tmp/papirus-install.sh
-        mode: '0755'
-
-    - name: install papirus icon theme
-      command: /tmp/papirus-install.sh
-
-    - name: remove papirus installer
-      file:
-        path: /tmp/papirus-install.sh
-        state: absent
-
 - name: install desktop snaps
   hosts: localhost
   connection: local
@@ -248,11 +233,33 @@
   hosts: localhost
   connection: local
   become: true
+  vars:
+    gemma3_engine: amd-gpu
+    gemma3_engine_component: llamacpp-rocm
   tasks:
     - name: install gemma3 inference snap
       community.general.snap:
         name: gemma3
         state: present
+
+    - name: list installed gemma3 components
+      command: snap components gemma3
+      register: gemma3_components
+      changed_when: false
+      failed_when: false
+
+    - name: install gemma3 engine component
+      command: "snap install gemma3+{{ gemma3_engine_component }}"
+      when: gemma3_engine_component not in gemma3_components.stdout
+
+    - name: show current gemma3 engine
+      command: gemma3 show-engine
+      register: gemma3_show_engine
+      changed_when: false
+
+    - name: switch gemma3 active engine
+      command: "gemma3 use-engine {{ gemma3_engine }}"
+      when: gemma3_engine not in gemma3_show_engine.stdout
 
     - name: install open-webui snap
       community.general.snap:
