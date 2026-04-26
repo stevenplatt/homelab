@@ -80,6 +80,10 @@
           - npm
           - docker.io
           - docker-compose-v2
+          # qemu for agentstack self-install (uses lima/qemu on linux)
+          - qemu-system-x86
+          - qemu-utils
+          - qemu-kvm
           - net-tools
           - build-essential
           - zlib1g-dev

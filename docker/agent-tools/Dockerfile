@@ -7,6 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         build-essential \
         ca-certificates \
+        qemu-system-x86 \
+        qemu-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # match the typical first-user uid/gid on a desktop Ubuntu host so

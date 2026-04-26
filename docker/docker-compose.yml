@@ -54,11 +54,16 @@ services:
       - ./workspace:/workspace
       - agent-tools-home:/home/agent
       - /var/run/docker.sock:/var/run/docker.sock
+    # /dev/kvm passthrough: agentstack's lima/qemu-based VM uses KVM accel
+    # if available. host needs qemu-kvm installed (handled by ansible).
+    devices:
+      - /dev/kvm
     # add the host's docker group so the non-root agent user can read
     # /var/run/docker.sock. filled in from the host at runtime by
     # docker-compose.sh; override by exporting DOCKER_GID before `up`.
     group_add:
       - "${DOCKER_GID:-999}"
+      - "${KVM_GID:-104}"
     environment:
       - OPENAI_API_BASE=http://lemonade:13305/v1
       - OPENAI_API_KEY=local

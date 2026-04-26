@@ -37,10 +37,35 @@ detect_gids() {
   export VIDEO_GID="$(gid_or_default video 44)"
   export RENDER_GID="$(gid_or_default render 110)"
   export DOCKER_GID="$(gid_or_default docker 999)"
+  export KVM_GID="$(gid_or_default kvm 104)"
 
   echo "==> host GIDs:"
-  printf "      docker = %s\n      render = %s\n      video  = %s\n" \
-    "$DOCKER_GID" "$RENDER_GID" "$VIDEO_GID"
+  printf "      docker = %s\n      render = %s\n      video  = %s\n      kvm    = %s\n" \
+    "$DOCKER_GID" "$RENDER_GID" "$VIDEO_GID" "$KVM_GID"
+}
+
+# ---------------------------------------------------------------------------
+# bootstrap AgentStack platform & launch the UI in the background.
+# `agentstack self install` is idempotent — on subsequent runs it detects
+# the existing platform and exits quickly.
+# ---------------------------------------------------------------------------
+bootstrap_agentstack() {
+  echo "==> bootstrapping AgentStack platform (first run can take 5-10 min)..."
+  if ! docker compose exec -T agent-tools agentstack self install; then
+    echo "WARN: 'agentstack self install' failed — UI will not be reachable" >&2
+    echo "      run 'docker compose logs agent-tools' to inspect"             >&2
+    return 1
+  fi
+
+  echo "==> launching AgentStack UI in background..."
+  # exec -d detaches; the process persists for the lifetime of the container.
+  # output goes to a logfile inside the named volume so subsequent runs can
+  # tail it if something goes wrong.
+  docker compose exec -d agent-tools sh -c \
+    'nohup agentstack ui --host 0.0.0.0 > /home/agent/.agentstack-ui.log 2>&1'
+
+  # give the UI a few seconds to bind a port before we probe it
+  sleep 5
 }
 
 # ---------------------------------------------------------------------------
@@ -100,6 +125,8 @@ case "$cmd" in
     detect_gids
     docker compose up -d --build
 
+    bootstrap_agentstack || true
+
     echo
     echo "stack is up. UIs:"
     echo "  http://localhost:8080  (Open WebUI)"
@@ -109,10 +136,8 @@ case "$cmd" in
     if url=$(get_agentstack_url); then
       echo "  ${url}  (AgentStack UI)"
     else
-      echo "  AgentStack UI: not yet running. Bootstrap once with:"
-      echo "    docker compose exec agent-tools agentstack self install"
-      echo "    docker compose exec agent-tools agentstack ui --host 0.0.0.0"
-      echo "  Then rerun this script's 'up' to refresh and detect the port."
+      echo "  AgentStack UI: not reachable yet. tail the bootstrap log with:"
+      echo "    docker compose exec agent-tools cat /home/agent/.agentstack-ui.log"
     fi
     ;;
 
