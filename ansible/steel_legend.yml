@@ -80,11 +80,6 @@
           - npm
           - docker.io
           - docker-compose-v2
-          # qemu for agentstack self-install (uses lima/qemu on linux).
-          # qemu-system-x86 has KVM accel compiled in; the qemu-kvm package
-          # was dropped after 22.04. /dev/kvm + 'kvm' group give access.
-          - qemu-system-x86
-          - qemu-utils
           - net-tools
           - build-essential
           - zlib1g-dev
@@ -256,7 +251,7 @@
         state: present
       failed_when: false
 
-    - name: ensure gpu/virt access groups exist
+    - name: ensure gpu access groups exist
       become: true
       group:
         name: "{{ item }}"
@@ -264,13 +259,12 @@
       loop:
         - render
         - video
-        - kvm
 
-    - name: add user to docker, render, video, kvm groups
+    - name: add user to docker, render, video groups
       become: true
       user:
         name: "{{ target_user }}"
-        groups: docker,render,video,kvm
+        groups: docker,render,video
         append: true
 
     - name: enable and start docker stack at boot

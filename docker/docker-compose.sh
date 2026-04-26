@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # wrapper around `docker compose` that:
-#   - discovers host-specific GIDs (docker, render, video) at runtime so the
-#     compose file is portable between machines that assign these groups
-#     different IDs
-#   - probes AgentStack's actual UI port after `up` instead of guessing
-#   - on `down`, sweeps containers spawned *outside* the compose project by
-#     openhands and agentstack/beeai (they bind-mount the host docker socket
-#     and create their own sandbox / kind-cluster containers)
+#   - discovers host-specific GIDs (render, video) at runtime so the compose
+#     file is portable between machines that assign these groups different IDs
+#   - polls every UI URL after `up`, prints periodic 'starting' progress,
+#     and only prints the final URLs once all services are responsive
+#   - on `down`, sweeps the per-task sandbox containers OpenHands spawns
+#     outside the compose project (it bind-mounts the host docker socket)
 #
 # usage: ./docker-compose.sh up
 #        ./docker-compose.sh down
@@ -17,6 +16,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 cmd="${1:-}"
+
+# tunables
+READY_TIMEOUT="${READY_TIMEOUT:-600}"   # seconds to wait for everything
+POLL_INTERVAL="${POLL_INTERVAL:-10}"    # seconds between progress prints
 
 # ---------------------------------------------------------------------------
 # discover host-specific GIDs
@@ -36,62 +39,86 @@ gid_or_default() {
 detect_gids() {
   export VIDEO_GID="$(gid_or_default video 44)"
   export RENDER_GID="$(gid_or_default render 110)"
-  export DOCKER_GID="$(gid_or_default docker 999)"
-  export KVM_GID="$(gid_or_default kvm 104)"
 
   echo "==> host GIDs:"
-  printf "      docker = %s\n      render = %s\n      video  = %s\n      kvm    = %s\n" \
-    "$DOCKER_GID" "$RENDER_GID" "$VIDEO_GID" "$KVM_GID"
+  printf "      render = %s\n      video  = %s\n" \
+    "$RENDER_GID" "$VIDEO_GID"
 }
 
 # ---------------------------------------------------------------------------
-# bootstrap AgentStack platform & launch the UI in the background.
-# `agentstack self install` is idempotent — on subsequent runs it detects
-# the existing platform and exits quickly.
+# treat any HTTP response (even 4xx) as 'alive'. only connection failure
+# (curl exit !=0 / code 000) and gateway errors (502-504) count as 'down'.
 # ---------------------------------------------------------------------------
-bootstrap_agentstack() {
-  echo "==> bootstrapping AgentStack platform (first run can take 5-10 min)..."
-  if ! docker compose exec -T agent-tools agentstack self install; then
-    echo "WARN: 'agentstack self install' failed — UI will not be reachable" >&2
-    echo "      run 'docker compose logs agent-tools' to inspect"             >&2
-    return 1
-  fi
-
-  echo "==> launching AgentStack UI in background..."
-  # exec -d detaches; the process persists for the lifetime of the container.
-  # output goes to a logfile inside the named volume so subsequent runs can
-  # tail it if something goes wrong.
-  docker compose exec -d agent-tools sh -c \
-    'nohup agentstack ui --host 0.0.0.0 > /home/agent/.agentstack-ui.log 2>&1'
-
-  # give the UI a few seconds to bind a port before we probe it
-  sleep 5
+is_url_alive() {
+  local code
+  code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 2 "$1" 2>/dev/null || echo "000")
+  case "$code" in
+    000|502|503|504) return 1 ;;
+    *) return 0 ;;
+  esac
 }
 
 # ---------------------------------------------------------------------------
-# probe AgentStack's actual UI port
-#
-# `docker compose port` returns the host port mapped to a given container
-# port. we try the common AgentStack UI ports (in container) and, for any
-# that's actually published AND responding to HTTP, we report that URL.
+# poll every service URL and print periodic 'starting' messages until all
+# are responsive (or timeout). prints the final URL list and returns 0
+# only when every service is live.
 # ---------------------------------------------------------------------------
-get_agentstack_url() {
-  local cport mapped host_port
-  for cport in 8333 8334 13900; do
-    mapped=$(docker compose port agent-tools "$cport" 2>/dev/null | tail -1) || continue
-    [ -n "$mapped" ] || continue
-    host_port=$(echo "$mapped" | awk -F: '{print $NF}')
-    if curl -fsS --max-time 2 "http://localhost:${host_port}/" >/dev/null 2>&1; then
-      echo "http://localhost:${host_port}"
+wait_for_all() {
+  local services=(
+    "Lemonade|http://localhost:13305/live"
+    "Open WebUI|http://localhost:8080/"
+    "OpenHands|http://localhost:3000/"
+  )
+
+  declare -A ready_url
+  local elapsed=0
+
+  echo "==> waiting for services to come online (timeout ${READY_TIMEOUT}s)..."
+
+  while [ "$elapsed" -lt "$READY_TIMEOUT" ]; do
+    local pending=()
+
+    for entry in "${services[@]}"; do
+      local name="${entry%%|*}"
+      local url="${entry##*|}"
+      if [ -n "${ready_url[$name]:-}" ]; then
+        continue
+      fi
+      if is_url_alive "$url"; then
+        ready_url[$name]="$url"
+        echo "    [ready] $name → $url"
+      else
+        pending+=("$name")
+      fi
+    done
+
+    if [ "${#pending[@]}" -eq 0 ]; then
+      echo
+      echo "stack is up and ready:"
+      echo "  ${ready_url[Lemonade]}      (Lemonade health)"
+      echo "  ${ready_url[Open WebUI]}             (Open WebUI)"
+      echo "  ${ready_url[OpenHands]}             (OpenHands)"
       return 0
     fi
+
+    printf "    starting (%ds elapsed): %s\n" "$elapsed" "$(IFS=', '; echo "${pending[*]}")"
+    sleep "$POLL_INTERVAL"
+    elapsed=$((elapsed + POLL_INTERVAL))
   done
+
+  echo
+  echo "WARN: timed out after ${READY_TIMEOUT}s. these services never responded:" >&2
+  for entry in "${services[@]}"; do
+    local name="${entry%%|*}"
+    [ -z "${ready_url[$name]:-}" ] && echo "  - $name" >&2 || true
+  done
+  echo "tail logs with: docker compose logs --tail 200" >&2
   return 1
 }
 
 # ---------------------------------------------------------------------------
-# clean up containers that openhands/agentstack spawn outside the compose
-# project (compose can't see or remove them)
+# clean up the OpenHands per-task sandbox containers that live outside the
+# compose project (compose can't see or remove them).
 # ---------------------------------------------------------------------------
 cleanup_orphans() {
   echo "==> removing OpenHands runtime sandbox containers"
@@ -102,15 +129,6 @@ cleanup_orphans() {
   echo "==> removing OpenHands by-name (openhands-*)"
   docker ps -a --format '{{.ID}} {{.Names}}' \
     | awk '$2 ~ /^openhands-/ {print $1}' \
-    | xargs -r docker rm -f
-
-  echo "==> removing AgentStack / BeeAI kind cluster nodes"
-  docker ps -aq --filter "label=io.x-k8s.kind.cluster" \
-    | xargs -r docker rm -f
-
-  echo "==> removing AgentStack / BeeAI platform containers (by name)"
-  docker ps -a --format '{{.ID}} {{.Names}}' \
-    | awk '$2 ~ /(agentstack|beeai)/ {print $1}' \
     | xargs -r docker rm -f
 
   echo "==> pruning dangling networks (best-effort)"
@@ -124,21 +142,7 @@ case "$cmd" in
   up)
     detect_gids
     docker compose up -d --build
-
-    bootstrap_agentstack || true
-
-    echo
-    echo "stack is up. UIs:"
-    echo "  http://localhost:8080  (Open WebUI)"
-    echo "  http://localhost:8501  (CrewAI Studio)"
-    echo "  http://localhost:3000  (OpenHands)"
-
-    if url=$(get_agentstack_url); then
-      echo "  ${url}  (AgentStack UI)"
-    else
-      echo "  AgentStack UI: not reachable yet. tail the bootstrap log with:"
-      echo "    docker compose exec agent-tools cat /home/agent/.agentstack-ui.log"
-    fi
+    wait_for_all
     ;;
 
   down)
