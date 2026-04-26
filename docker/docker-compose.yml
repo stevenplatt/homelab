@@ -57,7 +57,37 @@ services:
     command: ["sleep", "infinity"]
     restart: unless-stopped
 
+  # OpenHands needs the host docker socket so it can spawn its own per-task
+  # agent-server sandbox containers — that's a meaningful trust boundary
+  # (the openhands container effectively has root on the host docker daemon).
+  # only run this on a workstation you trust.
+  openhands:
+    image: docker.openhands.dev/openhands/openhands:1.6
+    container_name: openhands
+    ports:
+      - "3000:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - openhands-state:/.openhands
+    environment:
+      - AGENT_SERVER_IMAGE_REPOSITORY=ghcr.io/openhands/agent-server
+      - AGENT_SERVER_IMAGE_TAG=1.15.0-python
+      - LOG_ALL_EVENTS=true
+      # point OpenHands at the local lemonade endpoint. LiteLLM (used by
+      # OpenHands) needs the `openai/` prefix on the model id when talking
+      # to a generic OpenAI-compatible server.
+      - LLM_BASE_URL=http://lemonade:13305/v1
+      - LLM_API_KEY=local
+      - LLM_MODEL=openai/Qwen3.5-35B-A3B-GGUF
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      lemonade:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   lemonade-cache:
   open-webui-data:
   agent-tools-home:
+  openhands-state:

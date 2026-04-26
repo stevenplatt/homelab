@@ -1,6 +1,6 @@
 # Docker — local LLM stack
 
-A Docker Compose stack that runs AMD's [Lemonade Server](https://github.com/lemonade-sdk/lemonade) for local inference, with Open WebUI for browser chat and a development container that has CrewAI and AgentStack pre-installed.
+A Docker Compose stack that runs AMD's [Lemonade Server](https://github.com/lemonade-sdk/lemonade) for local inference, with Open WebUI for browser chat, OpenHands for autonomous coding tasks, and a development container that has CrewAI and AgentStack pre-installed.
 
 Lemonade is purpose-built for AMD GPUs/NPUs and ships with ROCm 7 bundled inside the image. RDNA4 (gfx1201, **Radeon AI Pro R9700** and the RX 9070/9060 series) is a first-class supported target — no `HSA_OVERRIDE_GFX_VERSION` games, no host ROCm install.
 
@@ -10,9 +10,10 @@ Lemonade is purpose-built for AMD GPUs/NPUs and ships with ROCm 7 bundled inside
 | --- | --- | --- | --- |
 | `lemonade` | `ghcr.io/lemonade-sdk/lemonade-server:latest` | `13305` | OpenAI-compatible inference server (`/v1/...`) |
 | `open-webui` | `ghcr.io/open-webui/open-webui:main` | `8080` | Browser chat UI, pre-wired to the lemonade endpoint |
+| `openhands` | `docker.openhands.dev/openhands/openhands:1.6` | `3000` | Autonomous coding agent — give it a task and it drives a sandbox to completion |
 | `agent-tools` | `./agent-tools` (built locally) | — | Long-running container with `crewai` + `agentstack` CLIs available; exec into it to write agents |
 
-All three share the compose network; `open-webui` and `agent-tools` reach lemonade at `http://lemonade:13305/v1`.
+The four services share the compose network; `open-webui`, `openhands`, and `agent-tools` all reach lemonade at `http://lemonade:13305/v1`.
 
 ## Prerequisites
 
@@ -64,9 +65,22 @@ agentstack --help
 
 # OPENAI_API_BASE, OPENAI_API_KEY, OPENAI_MODEL_NAME are already set,
 # so any LLM-aware tool (LangChain, CrewAI, AgentStack) hits local lemonade by default
+
+# OpenHands UI:
+#   http://localhost:3000
+# the LLM is preconfigured via env vars; first launch may show settings,
+# just confirm the model and click save.
 ```
 
 Drop your CrewAI / AgentStack project files into the `./workspace` directory on the host — it's bind-mounted into the container at `/workspace`.
+
+### Using OpenHands
+
+OpenHands is the autonomous-agent surface: you give it a task, it spawns its own sandbox container (via the host docker socket) and drives it to completion — reading code, running shells, browsing the web. The compose file pre-points it at the local lemonade endpoint via `LLM_BASE_URL`, `LLM_API_KEY`, and `LLM_MODEL` (with the `openai/` prefix LiteLLM requires for generic OpenAI-compatible servers).
+
+> ⚠️ **Trust boundary:** the `openhands` service bind-mounts `/var/run/docker.sock`, which gives it root-equivalent access to the host's docker daemon. It needs this to spawn agent-server sandbox containers. Only run this on a workstation you trust; don't expose port 3000 outside localhost.
+
+A 35B-class model is the practical floor for OpenHands to be useful — smaller models often loop or fail to follow the agent's tool-use protocol. Qwen 3.5 35B-A3B (the default in this stack) works well; reasoning-tuned models like DeepSeek-R1-Distill-Qwen-32B work even better for multi-step tasks.
 
 ## Configuration
 
@@ -77,6 +91,8 @@ All knobs are inlined directly in [docker-compose.yml](docker-compose.yml) — t
 | `agent-tools` | `OPENAI_MODEL_NAME` | `Qwen3.5-35B-A3B-GGUF` | Model name `agent-tools` calls (must match what you've pulled) |
 | `open-webui` | `WEBUI_AUTH` | `False` | Toggle Open WebUI login flow |
 | `open-webui` / `agent-tools` | `OPENAI_API_BASE_URL` / `OPENAI_API_BASE` | `http://lemonade:13305/v1` | Backend endpoint |
+| `openhands` | `LLM_MODEL` | `openai/Qwen3.5-35B-A3B-GGUF` | LiteLLM model id; **keep the `openai/` prefix** when talking to a generic OpenAI-compatible server |
+| `openhands` | `AGENT_SERVER_IMAGE_TAG` | `1.15.0-python` | Sandbox runtime tag OpenHands spawns for each task |
 
 ## Models
 
