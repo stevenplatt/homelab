@@ -22,16 +22,16 @@
   tasks:
     - name: set ssh key path
       set_fact:
-        ssh_key_path: "{{ ansible_env.HOME }}/.ssh/id_ed25519"
+        ssh_key_path: "{{ ansible_facts.env.HOME }}/.ssh/id_ed25519"
 
     - name: ensure ~/.ssh directory exists
       file:
-        path: "{{ ansible_env.HOME }}/.ssh"
+        path: "{{ ansible_facts.env.HOME }}/.ssh"
         state: directory
         mode: '0700'
 
     - name: generate ed25519 ssh key if missing
-      command: ssh-keygen -t ed25519 -f {{ ssh_key_path }} -N "" -C "{{ ansible_env.USER }}@{{ ansible_hostname }}"
+      command: ssh-keygen -t ed25519 -f {{ ssh_key_path }} -N "" -C "{{ ansible_facts.env.USER }}@{{ ansible_facts.hostname }}"
       args:
         creates: "{{ ssh_key_path }}"
 
@@ -228,6 +228,46 @@
         - /tmp/awscliv2.zip
         - /tmp/aws
 
+- name: install linux homebrew
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: check if homebrew is installed
+      stat:
+        path: /home/linuxbrew/.linuxbrew/bin/brew
+      register: brew_binary
+
+    - name: install homebrew prerequisites
+      become: true
+      apt:
+        name:
+          - build-essential
+          - procps
+          - file
+          - git
+        state: present
+      when: not brew_binary.stat.exists
+
+    - name: install homebrew non-interactively
+      shell: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      when: not brew_binary.stat.exists
+
+    - name: ensure brew shellenv is sourced in ~/.bashrc
+      lineinfile:
+        path: "{{ ansible_facts.env.HOME }}/.bashrc"
+        line: 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+        state: present
+
+- name: install homebrew packages
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: install mkcert via homebrew
+      community.general.homebrew:
+        name: mkcert
+        state: present
+        path: /home/linuxbrew/.linuxbrew/bin
+
 - name: install flatpak applications
   hosts: localhost
   connection: local
@@ -317,7 +357,7 @@
   tasks:
     - name: capture target user
       set_fact:
-        target_user: "{{ ansible_env.SUDO_USER | default(ansible_user_id, true) }}"
+        target_user: "{{ ansible_facts.env.SUDO_USER | default(ansible_facts.user_id, true) }}"
 
     - name: fail if target user resolved to root
       fail:
