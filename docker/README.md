@@ -1,6 +1,6 @@
 # Docker — local LLM stack
 
-A Docker Compose stack that runs AMD's [Lemonade Server](https://github.com/lemonade-sdk/lemonade) for local inference, with Open WebUI for browser chat, OpenHands for autonomous coding tasks, and a development container that has CrewAI and AgentStack pre-installed.
+A Docker Compose stack that runs AMD's [Lemonade Server](https://github.com/lemonade-sdk/lemonade) for local inference, with Open WebUI for browser chat, OpenHands for autonomous coding tasks, CrewAI Studio for visually designing multi-agent crews, and a development container with CrewAI and AgentStack pre-installed for code-first work.
 
 Lemonade is purpose-built for AMD GPUs/NPUs and ships with ROCm 7 bundled inside the image. RDNA4 (gfx1201, **Radeon AI Pro R9700** and the RX 9070/9060 series) is a first-class supported target — no `HSA_OVERRIDE_GFX_VERSION` games, no host ROCm install.
 
@@ -11,9 +11,11 @@ Lemonade is purpose-built for AMD GPUs/NPUs and ships with ROCm 7 bundled inside
 | `lemonade` | `ghcr.io/lemonade-sdk/lemonade-server:latest` | `13305` | OpenAI-compatible inference server (`/v1/...`) |
 | `open-webui` | `ghcr.io/open-webui/open-webui:main` | `8080` | Browser chat UI, pre-wired to the lemonade endpoint |
 | `openhands` | `docker.openhands.dev/openhands/openhands:1.6` | `3000` | Autonomous coding agent — give it a task and it drives a sandbox to completion |
+| `crewai-studio` | built from `strnad/CrewAI-Studio` | `8501` | Streamlit GUI for designing and running CrewAI crews (no-code) |
+| `crewai-db` | `postgres:15` | — | Postgres backing store for crewai-studio (internal only) |
 | `agent-tools` | `./agent-tools` (built locally) | — | Long-running container with `crewai` + `agentstack` CLIs available; exec into it to write agents |
 
-The four services share the compose network; `open-webui`, `openhands`, and `agent-tools` all reach lemonade at `http://lemonade:13305/v1`.
+The services share the compose network; `open-webui`, `openhands`, `crewai-studio`, and `agent-tools` all reach lemonade at `http://lemonade:13305/v1`.
 
 ## Prerequisites
 
@@ -70,6 +72,11 @@ agentstack --help
 #   http://localhost:3000
 # the LLM is preconfigured via env vars; first launch may show settings,
 # just confirm the model and click save.
+
+# CrewAI Studio UI:
+#   http://localhost:8501
+# in the model dropdown pick the OpenAI provider; the local lemonade endpoint
+# and Gemma-4-26B-A4B-it-GGUF model are pre-wired via env vars.
 ```
 
 Drop your CrewAI / AgentStack project files into the `./workspace` directory on the host — it's bind-mounted into the container at `/workspace`.
@@ -82,6 +89,14 @@ OpenHands is the autonomous-agent surface: you give it a task, it spawns its own
 
 A 26B+ model is roughly the practical floor for OpenHands to be useful — smaller models often loop or fail to follow the agent's tool-use protocol. Gemma 4 26B-A4B (the default in this stack) works for most tasks and benefits from large context windows; for harder multi-step problems, switching to a reasoning-tuned model like DeepSeek-R1-Distill-Qwen-32B is worth the trade-off in context room.
 
+### Using CrewAI Studio
+
+CrewAI Studio gives you a no-code Streamlit UI for assembling multi-agent crews — define agents, tasks, tools, and run a crew end-to-end — and persists everything in the `crewai-db` postgres. It's the visual counterpart to the code-first workflow inside `agent-tools`. The local lemonade endpoint is pre-wired via `OPENAI_API_BASE` / `OPENAI_API_KEY`, and `OPENAI_PROXY_MODELS` controls which model names show up in the dropdown.
+
+Because the upstream project doesn't publish a pre-built image, the service builds from the [strnad/CrewAI-Studio](https://github.com/strnad/CrewAI-Studio) git repo on first `docker compose up`. The first build pulls a few hundred MB of Python deps and takes a couple of minutes; subsequent ups reuse the layer cache.
+
+Crews and agent definitions live in the `crewai-db-data` volume — surviving `docker compose down` but wiped by `docker compose down -v`.
+
 ## Configuration
 
 All knobs are inlined directly in [docker-compose.yml](docker-compose.yml) — there is no `.env` file. Edit the YAML and `docker compose up -d` to apply.
@@ -93,6 +108,8 @@ All knobs are inlined directly in [docker-compose.yml](docker-compose.yml) — t
 | `open-webui` / `agent-tools` | `OPENAI_API_BASE_URL` / `OPENAI_API_BASE` | `http://lemonade:13305/v1` | Backend endpoint |
 | `openhands` | `LLM_MODEL` | `openai/Gemma-4-26B-A4B-it-GGUF` | LiteLLM model id; **keep the `openai/` prefix** when talking to a generic OpenAI-compatible server |
 | `openhands` | `AGENT_SERVER_IMAGE_TAG` | `1.15.0-python` | Sandbox runtime tag OpenHands spawns for each task |
+| `crewai-studio` | `OPENAI_PROXY_MODELS` | `Gemma-4-26B-A4B-it-GGUF` | Comma-separated list of model names shown in Studio's dropdown |
+| `crewai-db` | `POSTGRES_USER`/`PASSWORD`/`DB` | `crewai`/`crewai`/`crewai` | Internal-only Postgres credentials |
 
 ## Models
 
