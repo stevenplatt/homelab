@@ -56,10 +56,14 @@ services:
       - AGENT_SERVER_IMAGE_REPOSITORY=ghcr.io/openhands/agent-server
       - AGENT_SERVER_IMAGE_TAG=1.15.0-python
       - LOG_ALL_EVENTS=true
-      # point OpenHands at the local lemonade endpoint. LiteLLM (used by
-      # OpenHands) needs the `openai/` prefix on the model id when talking
-      # to a generic OpenAI-compatible server.
-      - LLM_BASE_URL=http://host.docker.internal:13305
+      # point OpenHands at lemonade via the host loopback (host.docker.internal
+      # → host-gateway). lemonade publishes port 13305 on the host, and the
+      # per-task sandbox containers OpenHands spawns aren't on the compose
+      # network, so they can't reach `lemonade` by name — only the host.
+      # LiteLLM appends /chat/completions to LLM_BASE_URL, so the URL must end
+      # in /v1. the model id keeps the `openai/` prefix LiteLLM needs to route
+      # to the generic OpenAI-compatible client.
+      - LLM_BASE_URL=http://host.docker.internal:13305/v1
       - LLM_API_KEY=local
       - LLM_MODEL=openai/Qwen3-Coder-30B-A3B-Instruct-GGUF
     extra_hosts:
