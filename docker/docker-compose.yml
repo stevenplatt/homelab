@@ -59,7 +59,7 @@ services:
       # point OpenHands at the local lemonade endpoint. LiteLLM (used by
       # OpenHands) needs the `openai/` prefix on the model id when talking
       # to a generic OpenAI-compatible server.
-      - LLM_BASE_URL=http://lemonade:13305
+      - LLM_BASE_URL=http://host.docker.internal:13305
       - LLM_API_KEY=local
       - LLM_MODEL=openai/Qwen3-Coder-30B-A3B-Instruct-GGUF
     extra_hosts:
