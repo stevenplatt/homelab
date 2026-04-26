@@ -57,7 +57,7 @@ services:
     # /dev/kvm passthrough: agentstack's lima/qemu-based VM uses KVM accel
     # if available. host needs qemu-kvm installed (handled by ansible).
     devices:
-      - /dev/kvm
+      - /dev/kvm:/dev/kvm
     # add the host's docker group so the non-root agent user can read
     # /var/run/docker.sock. filled in from the host at runtime by
     # docker-compose.sh; override by exporting DOCKER_GID before `up`.

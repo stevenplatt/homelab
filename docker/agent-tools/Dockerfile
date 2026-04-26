@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         build-essential \
         ca-certificates \
+        openssh-client \
         qemu-system-x86 \
         qemu-utils \
     && rm -rf /var/lib/apt/lists/*
