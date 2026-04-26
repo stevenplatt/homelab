@@ -56,6 +56,47 @@
           {{ ssh_public_key.content | b64decode }}
           ================================================================
 
+- name: configure git user identity
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: check current git user.name
+      command: git config --global --get user.name
+      register: git_name_check
+      failed_when: false
+      changed_when: false
+
+    - name: check current git user.email
+      command: git config --global --get user.email
+      register: git_email_check
+      failed_when: false
+      changed_when: false
+
+    - name: prompt for git user.name
+      pause:
+        prompt: "enter git user.name"
+      register: git_name_input
+      when: git_name_check.rc != 0 or (git_name_check.stdout | trim) == ""
+
+    - name: prompt for git user.email
+      pause:
+        prompt: "enter git user.email"
+      register: git_email_input
+      when: git_email_check.rc != 0 or (git_email_check.stdout | trim) == ""
+
+    - name: set git user.name
+      command: git config --global user.name "{{ git_name_input.user_input | trim }}"
+      when:
+        - git_name_input is not skipped
+        - (git_name_input.user_input | trim) != ""
+
+    - name: set git user.email
+      command: git config --global user.email "{{ git_email_input.user_input | trim }}"
+      when:
+        - git_email_input is not skipped
+        - (git_email_input.user_input | trim) != ""
+
 # performs a full configuration of a cleanly installed ubuntu operating system
 # targets Ubuntu 26.04 LTS
 
