@@ -10,11 +10,12 @@ services:
       - /dev/kfd
       - /dev/dri
     # numeric GIDs, not names: docker resolves names against the container's
-    # /etc/group (not the host's), so the names always fail. confirm with
-    # `getent group video` and `getent group render` on the host and adjust.
+    # /etc/group (not the host's), so the names always fail. these are filled
+    # in from the host at runtime by docker-compose.sh (or default to common
+    # values); override by exporting VIDEO_GID / RENDER_GID before `up`.
     group_add:
-      - "44"   # video
-      - "990"  # render
+      - "${VIDEO_GID:-44}"
+      - "${RENDER_GID:-110}"
     healthcheck:
       test: ["CMD-SHELL", "curl -fs http://localhost:13305/live || exit 1"]
       interval: 30s
@@ -42,9 +43,22 @@ services:
   agent-tools:
     build: ./agent-tools
     container_name: agent-tools
+    # docker.sock is mounted so `agentstack self install` can spawn the
+    # AgentStack/BeeAI platform (kind cluster + supporting containers) — same
+    # trust pattern as openhands. ports 8333 (UI) and 8334 (API) match the
+    # AgentStack defaults; adjust if `agentstack ui` reports a different port.
+    ports:
+      - "8333:8333"
+      - "8334:8334"
     volumes:
       - ./workspace:/workspace
       - agent-tools-home:/home/agent
+      - /var/run/docker.sock:/var/run/docker.sock
+    # add the host's docker group so the non-root agent user can read
+    # /var/run/docker.sock. filled in from the host at runtime by
+    # docker-compose.sh; override by exporting DOCKER_GID before `up`.
+    group_add:
+      - "${DOCKER_GID:-999}"
     environment:
       - OPENAI_API_BASE=http://lemonade:13305/v1
       - OPENAI_API_KEY=local

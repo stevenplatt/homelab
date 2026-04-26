@@ -28,11 +28,33 @@ After running the playbook, **log out and back in** so the new group memberships
 
 ## Setup
 
+Use the wrapper script — it brings the stack up *and* cleans up the orphan containers OpenHands and AgentStack spawn outside the compose project on `down`:
+
 ```sh
 mkdir -p workspace
-docker compose pull
-docker compose up -d
+./docker-compose.sh up
 ```
+
+To tear everything down (including the agent-spawned sandbox containers):
+
+```sh
+./docker-compose.sh down
+```
+
+If you'd rather drive `docker compose` directly, that still works — but you'll have to find and remove the OpenHands runtime containers and the AgentStack/BeeAI kind-cluster nodes by hand after each `down`.
+
+### Bootstrap AgentStack platform (one-time)
+
+The `agent-tools` container has the AgentStack CLI installed but the *platform* (the runtime that backs the web UI) needs a one-time bootstrap that uses the host docker socket to spin up its own backing containers. After the first `up`:
+
+```sh
+docker compose exec agent-tools agentstack self install
+docker compose exec agent-tools agentstack ui --host 0.0.0.0
+```
+
+Then browse to `http://localhost:8333`. The bootstrap state lives in the `agent-tools-home` volume so subsequent `up`s don't redo it. If `agentstack ui` reports a different port, update the `ports:` block on the `agent-tools` service in [docker-compose.yml](docker-compose.yml) accordingly.
+
+> ⚠️ **Trust boundary:** `agent-tools` now bind-mounts `/var/run/docker.sock` (same pattern as `openhands`). It can spawn arbitrary containers on the host docker daemon. The `docker-compose.sh down` command sweeps up the agent-spawned containers it created.
 
 The `lemonade` container starts with no model loaded. Pull one before first use:
 
@@ -174,7 +196,14 @@ If `rocminfo` fails inside the container but works on the host, the user isn't i
 ## Stopping & cleanup
 
 ```sh
+./docker-compose.sh down             # stop the stack AND remove orphan agent containers
 docker compose stop                  # stop, keep volumes (model cache persists)
-docker compose down                  # stop and remove containers
-docker compose down -v               # also wipe volumes (re-downloads models)
+docker compose down -v               # wipe volumes too (re-downloads models)
 ```
+
+The wrapper's `down` mode targets:
+- OpenHands runtime sandbox containers (`openhands/agent-server*` images, `openhands-*` names)
+- AgentStack/BeeAI kind cluster nodes (containers with the `io.x-k8s.kind.cluster` label)
+- AgentStack/BeeAI platform containers (by name match)
+
+If the agent containers ever pile up because you ran plain `docker compose down`, you can run `./docker-compose.sh down` again to sweep them up — it's idempotent.
