@@ -1,4 +1,8 @@
 services:
+  # lemonade-server starts with no model loaded. the wrapper script
+  # (docker-compose.sh) pulls LEMONADE_MODEL and persists LEMONADE_CTX_SIZE
+  # via `lemonade load --save-options` after the service is healthy — that's
+  # the single source of truth for model/ctx config, don't add knobs here.
   lemonade:
     image: ghcr.io/lemonade-sdk/lemonade-server:latest
     container_name: lemonade

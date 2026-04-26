@@ -22,9 +22,11 @@ READY_TIMEOUT="${READY_TIMEOUT:-600}"   # seconds to wait for everything
 POLL_INTERVAL="${POLL_INTERVAL:-10}"    # seconds between progress prints
 
 # model + context size lemonade should ensure-pulled and persist on every up.
-# ctx_size at 32768 leaves ~16 GB free on a 32 GB R9700; reduce if you OOM.
+# ctx_size at 65536 leaves ~10 GB free on a 32 GB R9700 — enough headroom for
+# OpenHands' long agentic conversations (the prior 32768 default OOM'd them
+# with a 400 from llama-server). reduce if you OOM, raise if you have VRAM.
 LEMONADE_MODEL="${LEMONADE_MODEL:-Qwen3-Coder-30B-A3B-Instruct-GGUF}"
-LEMONADE_CTX_SIZE="${LEMONADE_CTX_SIZE:-32768}"
+LEMONADE_CTX_SIZE="${LEMONADE_CTX_SIZE:-65536}"
 
 # ---------------------------------------------------------------------------
 # discover host-specific GIDs
