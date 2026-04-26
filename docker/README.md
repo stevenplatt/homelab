@@ -35,10 +35,10 @@ docker compose up -d
 The `lemonade` container starts with no model loaded. Pull one before first use:
 
 ```sh
-docker compose exec lemonade ./lemonade pull Qwen3.5-35B-A3B-GGUF
+docker compose exec lemonade ./lemonade pull Gemma-4-26B-A4B-it-GGUF
 ```
 
-That's Qwen 3.5 35B-A3B (MoE) at 4-bit — ~21GB VRAM, with only 3B parameters active per token, so it runs at near-small-model speed (~180 tok/s on the R9700) while delivering 35B-class quality. Confirm the exact catalog name with `./lemonade list` if the pull errors.
+That's Gemma 4 26B-A4B (MoE) at 4-bit — ~14GB of weights with only ~4B parameters active per token, so it's fast on the R9700 and leaves plenty of VRAM for KV cache (~16GB free for context, easily 32K+ tokens). Confirm the exact catalog name with `./lemonade list` if the pull errors.
 
 The first pull downloads the weights into the `lemonade-cache` volume. Subsequent restarts reuse them.
 
@@ -80,7 +80,7 @@ OpenHands is the autonomous-agent surface: you give it a task, it spawns its own
 
 > ⚠️ **Trust boundary:** the `openhands` service bind-mounts `/var/run/docker.sock`, which gives it root-equivalent access to the host's docker daemon. It needs this to spawn agent-server sandbox containers. Only run this on a workstation you trust; don't expose port 3000 outside localhost.
 
-A 35B-class model is the practical floor for OpenHands to be useful — smaller models often loop or fail to follow the agent's tool-use protocol. Qwen 3.5 35B-A3B (the default in this stack) works well; reasoning-tuned models like DeepSeek-R1-Distill-Qwen-32B work even better for multi-step tasks.
+A 26B+ model is roughly the practical floor for OpenHands to be useful — smaller models often loop or fail to follow the agent's tool-use protocol. Gemma 4 26B-A4B (the default in this stack) works for most tasks and benefits from large context windows; for harder multi-step problems, switching to a reasoning-tuned model like DeepSeek-R1-Distill-Qwen-32B is worth the trade-off in context room.
 
 ## Configuration
 
@@ -88,10 +88,10 @@ All knobs are inlined directly in [docker-compose.yml](docker-compose.yml) — t
 
 | Service | Key | Default | What it does |
 | --- | --- | --- | --- |
-| `agent-tools` | `OPENAI_MODEL_NAME` | `Qwen3.5-35B-A3B-GGUF` | Model name `agent-tools` calls (must match what you've pulled) |
+| `agent-tools` | `OPENAI_MODEL_NAME` | `Gemma-4-26B-A4B-it-GGUF` | Model name `agent-tools` calls (must match what you've pulled) |
 | `open-webui` | `WEBUI_AUTH` | `False` | Toggle Open WebUI login flow |
 | `open-webui` / `agent-tools` | `OPENAI_API_BASE_URL` / `OPENAI_API_BASE` | `http://lemonade:13305/v1` | Backend endpoint |
-| `openhands` | `LLM_MODEL` | `openai/Qwen3.5-35B-A3B-GGUF` | LiteLLM model id; **keep the `openai/` prefix** when talking to a generic OpenAI-compatible server |
+| `openhands` | `LLM_MODEL` | `openai/Gemma-4-26B-A4B-it-GGUF` | LiteLLM model id; **keep the `openai/` prefix** when talking to a generic OpenAI-compatible server |
 | `openhands` | `AGENT_SERVER_IMAGE_TAG` | `1.15.0-python` | Sandbox runtime tag OpenHands spawns for each task |
 
 ## Models

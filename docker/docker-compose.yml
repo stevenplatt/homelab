@@ -48,7 +48,7 @@ services:
     environment:
       - OPENAI_API_BASE=http://lemonade:13305/v1
       - OPENAI_API_KEY=local
-      - OPENAI_MODEL_NAME=Qwen3.5-35B-A3B-GGUF
+      - OPENAI_MODEL_NAME=Gemma-4-26B-A4B-it-GGUF
     tty: true
     stdin_open: true
     depends_on:
@@ -78,7 +78,7 @@ services:
       # to a generic OpenAI-compatible server.
       - LLM_BASE_URL=http://lemonade:13305/v1
       - LLM_API_KEY=local
-      - LLM_MODEL=openai/Qwen3.5-35B-A3B-GGUF
+      - LLM_MODEL=openai/Gemma-4-26B-A4B-it-GGUF
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
