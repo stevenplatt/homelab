@@ -42,10 +42,10 @@ If you'd rather drive `docker compose` directly, that still works — but you'll
 The `lemonade` container starts with no model loaded. Pull one before first use:
 
 ```sh
-docker compose exec lemonade ./lemonade pull Gemma-4-26B-A4B-it-GGUF
+docker compose exec lemonade ./lemonade pull Qwen3-Coder-30B-A3B-Instruct-GGUF
 ```
 
-That's Gemma 4 26B-A4B (MoE) at 4-bit — ~14GB of weights with only ~4B parameters active per token, so it's fast on the R9700 and leaves plenty of VRAM for KV cache (~16GB free for context, easily 32K+ tokens). Confirm the exact catalog name with `./lemonade list` if the pull errors.
+That's Qwen3 Coder 30B-A3B-Instruct (MoE) at 4-bit — ~16GB of weights with only ~3B parameters active per token, post-trained specifically on agentic coding traces (multi-step `read → patch → run → revise` loops). Fast on the R9700 and leaves ~16GB for KV cache (32K+ context). Confirm the exact catalog name with `./lemonade list` if the pull errors.
 
 ## Verifying
 
@@ -73,7 +73,7 @@ OpenHands is the autonomous-agent surface: you give it a task, it spawns its own
 
 > ⚠️ **Trust boundary:** the `openhands` service bind-mounts `/var/run/docker.sock`, which gives it root-equivalent access to the host's docker daemon. It needs this to spawn agent-server sandbox containers. Only run this on a workstation you trust; don't expose port 3000 outside localhost.
 
-A 26B+ model is roughly the practical floor for OpenHands to be useful — smaller models often loop or fail to follow the agent's tool-use protocol. Gemma 4 26B-A4B (the default in this stack) works for most tasks and benefits from large context windows; for harder multi-step problems, switching to a reasoning-tuned model like DeepSeek-R1-Distill-Qwen-32B is worth the trade-off in context room.
+A 26B+ model is roughly the practical floor for OpenHands to be useful — smaller models often loop or fail to follow the agent's tool-use protocol. Qwen3-Coder-30B-A3B-Instruct (the default in this stack) is purpose-built for agentic coding: post-trained on multi-step coding-agent traces, with strong tool-call format adherence and SWE-bench-leading numbers in this size class. For harder reasoning-heavy tasks, DeepSeek-R1-Distill-Qwen-32B is the usual fallback at the cost of some context headroom.
 
 ## Configuration
 
@@ -83,7 +83,7 @@ All knobs are inlined directly in [docker-compose.yml](docker-compose.yml) — t
 | --- | --- | --- | --- |
 | `open-webui` | `WEBUI_AUTH` | `False` | Toggle Open WebUI login flow |
 | `open-webui` | `OPENAI_API_BASE_URL` | `http://lemonade:13305/v1` | Backend endpoint |
-| `openhands` | `LLM_MODEL` | `openai/Gemma-4-26B-A4B-it-GGUF` | LiteLLM model id; **keep the `openai/` prefix** when talking to a generic OpenAI-compatible server |
+| `openhands` | `LLM_MODEL` | `openai/Qwen3-Coder-30B-A3B-Instruct-GGUF` | LiteLLM model id; **keep the `openai/` prefix** when talking to a generic OpenAI-compatible server |
 | `openhands` | `AGENT_SERVER_IMAGE_TAG` | `1.15.0-python` | Sandbox runtime tag OpenHands spawns for each task |
 
 The wrapper script also exports two dynamically-detected env vars consumed by the compose file:

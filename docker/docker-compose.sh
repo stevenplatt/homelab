@@ -21,6 +21,11 @@ cmd="${1:-}"
 READY_TIMEOUT="${READY_TIMEOUT:-600}"   # seconds to wait for everything
 POLL_INTERVAL="${POLL_INTERVAL:-10}"    # seconds between progress prints
 
+# model + context size lemonade should ensure-pulled and persist on every up.
+# ctx_size at 32768 leaves ~16 GB free on a 32 GB R9700; reduce if you OOM.
+LEMONADE_MODEL="${LEMONADE_MODEL:-Qwen3-Coder-30B-A3B-Instruct-GGUF}"
+LEMONADE_CTX_SIZE="${LEMONADE_CTX_SIZE:-32768}"
+
 # ---------------------------------------------------------------------------
 # discover host-specific GIDs
 # ---------------------------------------------------------------------------
@@ -56,6 +61,49 @@ is_url_alive() {
     000|502|503|504) return 1 ;;
     *) return 0 ;;
   esac
+}
+
+# ---------------------------------------------------------------------------
+# wait specifically for lemonade's /live endpoint so we can run model-config
+# commands against it before unblocking the wider readiness check.
+# ---------------------------------------------------------------------------
+wait_for_lemonade() {
+  local timeout=300
+  local elapsed=0
+  echo "==> waiting for lemonade /live ..."
+  while [ "$elapsed" -lt "$timeout" ]; do
+    if is_url_alive "http://localhost:13305/live"; then
+      echo "    [ready] Lemonade"
+      return 0
+    fi
+    printf "    starting (%ds): Lemonade\n" "$elapsed"
+    sleep "$POLL_INTERVAL"
+    elapsed=$((elapsed + POLL_INTERVAL))
+  done
+  echo "WARN: lemonade did not respond within ${timeout}s" >&2
+  return 1
+}
+
+# ---------------------------------------------------------------------------
+# pull the configured model (idempotent) and persist its ctx_size into
+# lemonade's recipe_options.json via --save-options. on subsequent runs
+# this is a fast no-op.
+# ---------------------------------------------------------------------------
+configure_lemonade_model() {
+  echo "==> ensuring '$LEMONADE_MODEL' is pulled (idempotent)..."
+  if ! docker compose exec -T lemonade ./lemonade pull "$LEMONADE_MODEL"; then
+    echo "WARN: pull failed — skipping ctx_size persist" >&2
+    return 1
+  fi
+
+  echo "==> persisting ctx_size=$LEMONADE_CTX_SIZE for '$LEMONADE_MODEL'..."
+  if ! docker compose exec -T lemonade ./lemonade load \
+       "$LEMONADE_MODEL" --ctx-size "$LEMONADE_CTX_SIZE" --save-options; then
+    echo "WARN: ctx_size persist failed — may be too large for VRAM." >&2
+    echo "      reduce LEMONADE_CTX_SIZE (try 16384) and rerun 'up'." >&2
+    return 1
+  fi
+  echo "    [configured] $LEMONADE_MODEL · ctx_size=$LEMONADE_CTX_SIZE"
 }
 
 # ---------------------------------------------------------------------------
@@ -142,6 +190,14 @@ case "$cmd" in
   up)
     detect_gids
     docker compose up -d --build
+
+    # gate on lemonade being live before issuing model-config commands;
+    # then persist the model + ctx_size so the runtime uses the right
+    # context window and openhands has the headroom it needs.
+    if wait_for_lemonade; then
+      configure_lemonade_model || true
+    fi
+
     wait_for_all
     ;;
 

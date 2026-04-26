@@ -61,7 +61,7 @@ services:
       # to a generic OpenAI-compatible server.
       - LLM_BASE_URL=http://lemonade:13305/v1
       - LLM_API_KEY=local
-      - LLM_MODEL=openai/Gemma-4-26B-A4B-it-GGUF
+      - LLM_MODEL=openai/Qwen3-Coder-30B-A3B-Instruct-GGUF
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
