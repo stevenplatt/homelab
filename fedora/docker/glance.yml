@@ -1,0 +1,36 @@
+# glance dashboard config — version-controlled here and bind-mounted into
+# the glance container by docker-compose.yml. edit, then re-run ../setup.sh
+# (or `docker compose restart glance`) to apply.
+# widget reference: https://github.com/glanceapp/glance/blob/main/docs/configuration.md
+#
+# host services are reached via host.docker.internal (mapped to the host
+# gateway in docker-compose.yml); container services by their compose name.
+server:
+  port: 8080
+
+pages:
+  - name: Home
+    columns:
+      - size: full
+        widgets:
+          - type: monitor
+            title: homelab services
+            cache: 1m
+            sites:
+              - title: lm studio api
+                url: http://host.docker.internal:1234/v1/models
+              - title: hermes dashboard
+                url: http://host.docker.internal:9119
+              - title: open webui
+                url: http://open-webui:8080
+
+          - type: bookmarks
+            groups:
+              - title: homelab
+                links:
+                  - title: open webui (chat)
+                    url: http://localhost:8080
+                  - title: hermes dashboard
+                    url: http://localhost:9119
+                  - title: homelab repo
+                    url: https://github.com/stevenplatt/homelab

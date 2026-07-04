@@ -11,6 +11,7 @@
 #   4. install devops tooling (gcloud, aws cli, helm, terraform, kubectl,
 #      kind, podman desktop, docker daemon, docker compose)
 #   5. enable remote desktop access (gnome rdp, port 3389)
+#   6. install tailscale (started at boot; auth with `sudo tailscale up`)
 #
 # run as your normal user; sudo is used where root is required.
 
@@ -21,11 +22,14 @@ if [[ "$(id -u)" -eq 0 ]]; then
     exit 1
 fi
 
+# resolve the invoking user from the session, not the environment
+CURRENT_USER="$(whoami)"
+
 # sudo is missing on minimal installs — bootstrap it via su if needed
 if ! command -v sudo > /dev/null 2>&1; then
     echo "sudo not found — installing it (enter the root password when prompted)"
-    su -c "dnf install -y sudo && usermod -aG wheel $USER"
-    echo "sudo installed and $USER added to the wheel group."
+    su -c "dnf install -y sudo && usermod -aG wheel $CURRENT_USER"
+    echo "sudo installed and $CURRENT_USER added to the wheel group."
     echo "log out and back in, then re-run this script."
     exit 1
 fi
@@ -69,9 +73,14 @@ configure_git_identity() {
 
     local git_name git_email
 
+    # GIT_USER_NAME / GIT_USER_EMAIL are pre-collected by setup.sh so this
+    # step stays unattended behind the tui; prompt only when run standalone
     git_name="$(git config --global --get user.name || true)"
     if [[ -z "${git_name// /}" ]]; then
-        read -r -p "enter git user.name: " git_name
+        git_name="${GIT_USER_NAME:-}"
+        if [[ -z "${git_name// /}" ]]; then
+            read -r -p "enter git user.name: " git_name
+        fi
         if [[ -n "${git_name// /}" ]]; then
             git config --global user.name "$git_name"
         fi
@@ -81,7 +90,10 @@ configure_git_identity() {
 
     git_email="$(git config --global --get user.email || true)"
     if [[ -z "${git_email// /}" ]]; then
-        read -r -p "enter git user.email: " git_email
+        git_email="${GIT_USER_EMAIL:-}"
+        if [[ -z "${git_email// /}" ]]; then
+            read -r -p "enter git user.email: " git_email
+        fi
         if [[ -n "${git_email// /}" ]]; then
             git config --global user.email "$git_email"
         fi
@@ -224,7 +236,7 @@ After=docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-User=$USER
+User=$CURRENT_USER
 Environment="HOME=$HOME"
 ExecStart=/bin/bash -c '/usr/local/bin/kind get clusters | grep -qx homelab || /usr/local/bin/kind create cluster --name homelab'
 
@@ -259,9 +271,9 @@ configure_docker_daemon() {
     sudo systemctl enable --now docker.socket
     sudo systemctl enable --now docker.service
 
-    if ! id -nG "$USER" | grep -qw docker; then
-        sudo usermod -aG docker "$USER"
-        echo "added $USER to docker group — log out and back in for it to take effect"
+    if ! id -nG "$CURRENT_USER" | grep -qw docker; then
+        sudo usermod -aG docker "$CURRENT_USER"
+        echo "added $CURRENT_USER to docker group — log out and back in for it to take effect"
     fi
 }
 
@@ -299,12 +311,16 @@ setup_remote_desktop() {
     grdctl rdp set-tls-cert "$grd_dir/rdp-tls.crt"
     grdctl rdp set-tls-key "$grd_dir/rdp-tls.key"
 
-    # prompt for connection credentials only when rdp isn't configured yet
+    # set credentials only when rdp isn't configured yet. RDP_USER / RDP_PASS
+    # are pre-collected by setup.sh so this stays unattended behind the tui;
+    # prompt only when run standalone
     if ! grdctl status 2>/dev/null | grep -A2 'RDP' | grep -q 'enabled'; then
-        local rdp_user rdp_pass
-        read -r -p "enter remote desktop username: " rdp_user
-        read -r -s -p "enter remote desktop password: " rdp_pass
-        echo
+        local rdp_user="${RDP_USER:-}" rdp_pass="${RDP_PASS:-}"
+        if [[ -z "$rdp_user" ]]; then
+            read -r -p "enter remote desktop username: " rdp_user
+            read -r -s -p "enter remote desktop password: " rdp_pass
+            echo
+        fi
         grdctl rdp set-credentials "$rdp_user" "$rdp_pass"
     else
         echo "rdp already enabled — keeping existing credentials"
@@ -328,6 +344,32 @@ setup_remote_desktop() {
 }
 
 # ---------------------------------------------------------------
+# 6. install tailscale
+# ---------------------------------------------------------------
+install_tailscale() {
+    echo "==> installing tailscale"
+
+    # repo setup from: https://tailscale.com/download/linux/fedora
+    if [[ ! -f /etc/yum.repos.d/tailscale.repo ]]; then
+        sudo curl -fsSL -o /etc/yum.repos.d/tailscale.repo \
+            https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+    fi
+
+    if ! rpm -q tailscale > /dev/null 2>&1; then
+        sudo dnf install -y tailscale
+    else
+        echo "tailscale already installed — skipping"
+    fi
+
+    sudo systemctl enable --now tailscaled
+
+    # joining the tailnet needs a one-time browser login — see the readme
+    if ! tailscale status > /dev/null 2>&1; then
+        echo "tailscale installed but not authenticated — run: sudo tailscale up"
+    fi
+}
+
+# ---------------------------------------------------------------
 # main
 # ---------------------------------------------------------------
 main() {
@@ -337,6 +379,7 @@ main() {
     install_homebrew
     install_devops_tooling
     setup_remote_desktop
+    install_tailscale
 
     echo "==> base system setup complete"
 }

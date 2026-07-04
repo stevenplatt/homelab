@@ -17,11 +17,14 @@ if [[ "$(id -u)" -eq 0 ]]; then
     exit 1
 fi
 
+# resolve the invoking user from the session, not the environment
+CURRENT_USER="$(whoami)"
+
 # sudo is missing on minimal installs — bootstrap it via su if needed
 if ! command -v sudo > /dev/null 2>&1; then
     echo "sudo not found — installing it (enter the root password when prompted)"
-    su -c "dnf install -y sudo && usermod -aG wheel $USER"
-    echo "sudo installed and $USER added to the wheel group."
+    su -c "dnf install -y sudo && usermod -aG wheel $CURRENT_USER"
+    echo "sudo installed and $CURRENT_USER added to the wheel group."
     echo "log out and back in, then re-run this script."
     exit 1
 fi

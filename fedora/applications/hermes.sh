@@ -16,11 +16,14 @@ if [[ "$(id -u)" -eq 0 ]]; then
     exit 1
 fi
 
+# resolve the invoking user from the session, not the environment
+CURRENT_USER="$(whoami)"
+
 # sudo is missing on minimal installs — bootstrap it via su if needed
 if ! command -v sudo > /dev/null 2>&1; then
     echo "sudo not found — installing it (enter the root password when prompted)"
-    su -c "dnf install -y sudo && usermod -aG wheel $USER"
-    echo "sudo installed and $USER added to the wheel group."
+    su -c "dnf install -y sudo && usermod -aG wheel $CURRENT_USER"
+    echo "sudo installed and $CURRENT_USER added to the wheel group."
     echo "log out and back in, then re-run this script."
     exit 1
 fi
@@ -42,15 +45,57 @@ LMS_ENDPOINT="http://localhost:1234/v1"   # lm studio server default port
 # ---------------------------------------------------------------
 # 1. install lm studio (headless cli + daemon)
 # ---------------------------------------------------------------
+# true only when the lms cli can reach a working daemon
+lms_daemon_ready() {
+    "$LMS_BIN" daemon up > /dev/null 2>&1 && "$LMS_BIN" ls > /dev/null 2>&1
+}
+
+# the desktop app runs its own built-in daemon that blocks standalone
+# llmster from starting and rejects the standalone cli's key. match gui
+# processes but not the headless daemon/cli living under ~/.lmstudio/
+lmstudio_gui_pids() {
+    pgrep -fa '[Ll][Mm][-_ ]?[Ss]tudio' 2>/dev/null \
+        | grep -v -e llmster -e '\.lmstudio/' \
+        | awk '{print $1}'
+}
+
+lmstudio_gui_running() {
+    [[ -n "$(lmstudio_gui_pids)" ]]
+}
+
+# force quit the desktop app so the headless daemon can start
+stop_lmstudio_gui() {
+    lmstudio_gui_running || return 0
+
+    echo "lm studio desktop app is running — force quitting it (its built-in"
+    echo "daemon conflicts with the headless one)"
+
+    # graceful first, then force whatever survives
+    lmstudio_gui_pids | xargs -r kill 2>/dev/null || true
+    local i
+    for i in 1 2 3 4 5; do
+        lmstudio_gui_running || return 0
+        sleep 1
+    done
+    lmstudio_gui_pids | xargs -r kill -9 2>/dev/null || true
+    sleep 1
+}
+
 install_lmstudio() {
     echo "==> installing lm studio (headless)"
 
+    stop_lmstudio_gui
+
+    # a manual gui/appimage install also provides $LMS_BIN but ships without
+    # the headless daemon (llmster), so the binary existing is not enough —
+    # verify the daemon responds, and (re)run the headless installer if not.
     # installer source: https://lmstudio.ai/docs/developer/core/headless_llmster
-    if [[ ! -x "$LMS_BIN" ]]; then
-        curl -fsSL https://lmstudio.ai/install.sh | bash
-    else
-        echo "lm studio already installed at $LMS_BIN"
+    if [[ -x "$LMS_BIN" ]] && lms_daemon_ready; then
+        echo "lm studio already installed and daemon responding"
+        return
     fi
+
+    curl -fsSL https://lmstudio.ai/install.sh | bash
 }
 
 # ---------------------------------------------------------------
@@ -58,6 +103,33 @@ install_lmstudio() {
 # ---------------------------------------------------------------
 download_qwen_model() {
     echo "==> ensuring model ${MODEL_KEY} is downloaded"
+
+    # the lms cli talks to the lm studio daemon — start it first, or every
+    # lms command fails with ENOENT on .lmstudio/.internal/lms-key-* (the
+    # daemon creates that key file on its first startup)
+    "$LMS_BIN" daemon up || true
+
+    local attempt
+    for attempt in 1 2 3 4 5; do
+        if "$LMS_BIN" ls > /dev/null 2>&1; then
+            break
+        fi
+        echo "waiting for lm studio daemon (attempt $attempt/5)..."
+        sleep 2
+        "$LMS_BIN" daemon up > /dev/null 2>&1 || true
+    done
+
+    if ! "$LMS_BIN" ls > /dev/null 2>&1; then
+        echo "error: lm studio daemon is not responding." >&2
+        if lmstudio_gui_running; then
+            echo "the lm studio desktop app is running — its built-in daemon blocks" >&2
+            echo "the headless one. quit the app (check the tray) and re-run setup." >&2
+        else
+            echo "try reinstalling the headless daemon:" >&2
+            echo "  curl -fsSL https://lmstudio.ai/install.sh | bash" >&2
+        fi
+        exit 1
+    fi
 
     if "$LMS_BIN" ls 2>/dev/null | grep -q "qwen3.6-35b-a3b"; then
         echo "model already downloaded — skipping"
@@ -74,38 +146,50 @@ download_qwen_model() {
 setup_lmstudio_service() {
     echo "==> configuring lm studio systemd service"
 
+    # a system unit can't exec binaries under \$HOME on fedora (selinux denies
+    # init_t → user_home_t, failing with 203/EXEC), so run a systemd *user*
+    # service instead; lingering makes it start at boot without a login.
     # unit layout from: https://lmstudio.ai/docs/developer/core/headless_llmster
-    local unit_path="/etc/systemd/system/lmstudio.service"
+    local unit_dir="$HOME/.config/systemd/user"
+    local unit_path="$unit_dir/lmstudio.service"
     local tmp_unit
     tmp_unit="$(mktemp)"
+
+    # drop the old (broken) system-level unit if a previous run created it
+    if [[ -f /etc/systemd/system/lmstudio.service ]]; then
+        sudo systemctl disable --now lmstudio.service 2>/dev/null || true
+        sudo rm -f /etc/systemd/system/lmstudio.service
+        sudo systemctl daemon-reload
+    fi
+
+    mkdir -p "$unit_dir"
 
     cat > "$tmp_unit" <<EOF
 [Unit]
 Description=LM Studio Server
-After=network-online.target
-Wants=network-online.target
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-User=$USER
-Environment="HOME=$HOME"
 ExecStartPre=$LMS_BIN daemon up
 ExecStartPre=$LMS_BIN load $MODEL_KEY --yes
 ExecStart=$LMS_BIN server start
 ExecStop=$LMS_BIN daemon down
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 EOF
 
-    if ! sudo cmp -s "$tmp_unit" "$unit_path" 2>/dev/null; then
-        sudo cp "$tmp_unit" "$unit_path"
-        sudo systemctl daemon-reload
+    if ! cmp -s "$tmp_unit" "$unit_path" 2>/dev/null; then
+        cp "$tmp_unit" "$unit_path"
+        systemctl --user daemon-reload
     fi
     rm -f "$tmp_unit"
 
-    sudo systemctl enable --now lmstudio.service
+    systemctl --user enable --now lmstudio.service
+
+    # start the user service at boot without waiting for a login
+    sudo loginctl enable-linger "$CURRENT_USER"
 }
 
 # ---------------------------------------------------------------
@@ -120,32 +204,60 @@ install_hermes() {
         return
     fi
 
-    curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+    # --skip-setup: the installer otherwise launches an interactive wizard
+    # that would hang invisibly behind the setup.sh tui. everything runs
+    # locally against lm studio — no nous portal account is used.
+    curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --skip-setup
 }
 
 configure_hermes() {
     echo "==> pointing hermes at the lm studio endpoint"
 
-    local config="$HOME/.hermes/config.yaml"
-    mkdir -p "$HOME/.hermes"
+    local hermes_bin
+    hermes_bin="$(command -v hermes || echo "$HOME/.local/bin/hermes")"
 
-    if [[ -f "$config" ]] && grep -q "$LMS_ENDPOINT" "$config"; then
-        echo "hermes already configured for $LMS_ENDPOINT"
-        return
-    fi
+    # lm studio is a first-class hermes provider (defaults to
+    # http://127.0.0.1:1234/v1) — see the model section of ~/.hermes/config.yaml
+    "$hermes_bin" config set model.provider lmstudio
+    "$hermes_bin" config set model.default "$MODEL_KEY"
+}
 
-    if [[ -f "$config" ]]; then
-        cp "$config" "${config}.bak"
-        echo "existing hermes config backed up to ${config}.bak"
-    fi
+setup_hermes_dashboard_service() {
+    echo "==> configuring hermes dashboard service (no browser auto-open)"
 
-    # config format from: https://hermes-agent.nousresearch.com/docs/integrations/providers
-    cat > "$config" <<EOF
-model:
-  default: $MODEL_KEY
-  provider: custom
-  base_url: $LMS_ENDPOINT
+    local hermes_bin
+    hermes_bin="$(command -v hermes || echo "$HOME/.local/bin/hermes")"
+
+    # systemd user service (same selinux reasoning as the lm studio unit);
+    # lingering — enabled in setup_lmstudio_service — starts it at boot.
+    # dashboard serves http://127.0.0.1:9119
+    local unit_dir="$HOME/.config/systemd/user"
+    local unit_path="$unit_dir/hermes-dashboard.service"
+    local tmp_unit
+    tmp_unit="$(mktemp)"
+
+    mkdir -p "$unit_dir"
+
+    cat > "$tmp_unit" <<EOF
+[Unit]
+Description=Hermes Agent Dashboard
+
+[Service]
+ExecStart=$hermes_bin dashboard --no-open
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
 EOF
+
+    if ! cmp -s "$tmp_unit" "$unit_path" 2>/dev/null; then
+        cp "$tmp_unit" "$unit_path"
+        systemctl --user daemon-reload
+    fi
+    rm -f "$tmp_unit"
+
+    systemctl --user enable --now hermes-dashboard.service
 }
 
 configure_hermes_slack() {
@@ -266,6 +378,7 @@ main() {
     setup_lmstudio_service
     install_hermes
     configure_hermes
+    setup_hermes_dashboard_service
     configure_hermes_slack
     install_pi
     configure_pi
