@@ -16,12 +16,12 @@ All three share the compose network; `open-webui` and `openhands` reach lemonade
 
 ## Prerequisites
 
-The Ansible playbook ([../ansible/steel_legend.yml](../ansible/steel_legend.yml)) handles the host setup:
-- `docker.io` and `docker-compose-v2` installed
-- Current user added to `docker`, `render`, `video` groups
+The Fedora setup script ([../fedora/setup.sh](../fedora/setup.sh)) handles the host setup:
+- Docker engine and the compose plugin installed
+- Current user added to the `docker` group
 - Docker service started and enabled
 
-After running the playbook, **log out and back in** so the new group memberships take effect — otherwise `docker` commands will fail with permission denied.
+After running the script, **log out and back in** so the new group memberships take effect — otherwise `docker` commands will fail with permission denied. You may also need to add your user to the `render` and `video` groups for GPU access (`sudo usermod -aG render,video $USER`).
 
 ## Setup
 

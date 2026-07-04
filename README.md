@@ -1,88 +1,64 @@
-# Homelab Research Testbed 
+# Homelab
 
-This repository holds configurations and documentation for deploying my personal homelab and network research tesbed.
+Configuration scripts for my personal homelab: workstation provisioning, local AI stacks, and desktop app deployment. Everything is idempotent — scripts can be re-run safely and skip whatever is already installed.
 
-The lab environment is intended to run under a infrastructure-as-code model, with all services running as containers deployable by Ansible, Terraform, and Helm within Kubernetes. Currently the lab is run in the cloud within [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine). 
+## Table of Contents
 
-### Table of Contents
+| Project | What it does | Getting started |
+| --- | --- | --- |
+| [Fedora Setup](fedora/) | Provisions a Fedora workstation: GitHub SSH key, git identity, Homebrew, devops tooling (gcloud, AWS CLI, kubectl, helm, terraform, kind, Docker, Podman Desktop), remote desktop (RDP), a local AI agent stack, and desktop apps | [Fedora](#fedora-setup) |
+| [Docker LLM Stack](docker/) | Docker Compose stack for local inference on AMD GPUs: Lemonade Server + Open WebUI + OpenHands | [Docker](#docker-llm-stack) |
+| [Windows Setup](windows/) | Bulk app installation for Windows 10/11 via a winget manifest | [Windows](#windows-setup) |
 
-[Cloud Environment](#cloud)
+## Fedora Setup
 
-[Developer Environments](#desktop)
+[`fedora/setup.sh`](fedora/setup.sh) orchestrates the scripts in [`fedora/applications/`](fedora/applications/):
 
-<a name="cloud"/>
+- [`homelab.sh`](fedora/applications/homelab.sh) — base system: SSH key, git identity, Homebrew, devops tooling, remote desktop (GNOME RDP on port 3389; prompts once for credentials — the session must be logged in, so enable GNOME auto-login for unattended access)
+- [`hermes.sh`](fedora/applications/hermes.sh) — local AI agents: LM Studio (headless, at boot) serving Qwen, with [Hermes](https://hermes-agent.nousresearch.com/) and [pi](https://pi.dev/) pointed at it
+- [`desktop.sh`](fedora/applications/desktop.sh) — desktop apps: VS Code and Steam (RPM), Slack, Flatseal, Zotero (Flathub)
 
-# Cloud Environment
+```sh
+git clone https://github.com/stevenplatt/homelab.git
+cd homelab/fedora
+./setup.sh
+```
 
-![alt text](https://github.com/stevenplatt/homelab/blob/main/img/cloud_k8s.jpg?raw=true)
+When finished it prints your git identity and SSH public key for pasting into [github.com/settings/keys](https://github.com/settings/keys). Log out and back in afterward so the `docker` group membership takes effect.
 
-## Cluster Components
+### Using Hermes
 
-**QTY 1:** Google Cloud Load Balancer  
+Run `hermes` in a terminal to chat — it's preconfigured to use the local Qwen model via LM Studio. `hermes setup --portal` (optional, one-time) unlocks Nous's hosted tools like web search and image generation. Hermes builds skills and memory across sessions, so it improves with use. See the [Hermes docs](https://hermes-agent.nousresearch.com/docs/) for the full guide.
 
-**QTY 1:** Google Kubernetes Engine Cluster
-- Autoscaling Node Group
-  -  Min: 1 nodes; Max: 3 nodes 
+**Slack:** to talk to Hermes from Slack, create the Slack app once by hand — run `hermes slack manifest --write`, paste the manifest at [api.slack.com/apps](https://api.slack.com/apps) (create new app → from manifest), and install it to your workspace. Then export the tokens and re-run setup:
 
-## Services List
+```sh
+export SLACK_BOT_TOKEN=xoxb-...   # bot token from the installed app
+export SLACK_APP_TOKEN=xapp-...   # app-level (socket mode) token
+export SLACK_ALLOWED_USERS=U...   # your slack member id — required, denies all others
+./setup.sh
+```
 
-The following containers are deployed with the Kebernetes cluster environment. 
+The script stores the tokens in `~/.hermes/.env` and installs the gateway as a service so Slack survives reboots. Invite the bot to a channel or DM it. Full walkthrough: [Hermes Slack setup](https://hermes-agent.nousresearch.com/docs/user-guide/messaging/slack).
 
-This list is included for demonstration purposes and can be considered partial or otherwise incomplete.
+## Docker LLM Stack
 
-- Telecomsteve (Website)
-- ResearchEng Portfolio (Website)
-- Prometheus (Monitoring)
-- Grafana (Monitoring Dashboard)
-- PiHole (ad blocking)
-- Librespeed (speed test)
-  
-## Cloud Deployment
+A compose stack for local LLM inference on AMD GPUs (ROCm bundled, RDNA2–4): [Lemonade Server](https://github.com/lemonade-sdk/lemonade) as an OpenAI-compatible endpoint, Open WebUI for browser chat, and OpenHands for autonomous coding. See the [full documentation](docker/README.md) for GPU notes, model management, and troubleshooting.
 
-Complete instructions for deploying both Kubernetes and containerized microservices can be found in the [wiki](https://github.com/stevenplatt/homelab/wiki) pages for this repository.  
+```sh
+cd homelab/docker
+./docker-compose.sh up     # brings up the stack, pulls the model, waits for readiness
+./docker-compose.sh down   # tears down, including OpenHands sandbox containers
+```
 
-<a name="desktop"/>
+## Windows Setup
 
-# Developer Environments
+A [winget manifest](windows/win11_deploy.json) bulk-installs applications on Windows 10/11. From an administrator PowerShell:
 
-This repository also holds configurations for desktop environments. 
+```powershell
+winget import -i windows\win11_deploy.json
+```
 
-## Windows
+## License
 
-Windows versions 10 and 11 can be configured using the ``` winget ``` utility. Winget is enabled automatically when app install is installed from the [Windows Store](https://www.microsoft.com/store/productId/9NBLGGH4NNS1). A GUI view of applictions that can be installed through winget is also available at [winstall.app](https://winstall.app/)
-
-#### Bulk App Installation (Winget)
-
-Open Windows PowerShell with administrator priveledges. 
-
-The Windows installation file is located at ``` .../homelab/desktop/windows/win11_deploy.json ``` and can be run using the PowerShell command: 
-
-``` winget import -i path\to\win11_deploy.json ```
-
-A json of installed programs can be exported using the command: 
-
-``` winget export -o path\to\export.json ```
-
-The following items are not installed with the winget utility and must be manually installed: 
-
-- Ansible
-- Terraform
-- Inkscape
-- Mendeley
-- Helm
-
-## Linux
-
-A shell script for either Fedora or Ubuntu distributions can be run directly from the Linux terminal to bulk install pre-set applications. 
-
-#### Bulk App Installation (Bash Script)
-
-From the Linux terminal: 
-
-- ``` git clone https://github.com/stevenplatt/homelab.git ``` 
-- ``` cd homelab/desktop/linux ```
-- ``` bash ubuntu_deploy.sh ``` or ``` bash fedora_deploy.sh ```
-
-## Kubernetes
-
-Kubectl can be manually configured to connect to the deployed Kubernetes instance with the instructions provided by [Google Cloud](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl).
+[MIT](LICENSE)
