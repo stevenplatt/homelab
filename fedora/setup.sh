@@ -24,6 +24,17 @@ if [[ "$(id -u)" -eq 0 ]]; then
     exit 1
 fi
 
+# ask for sudo once up front and keep the ticket fresh for the whole run.
+# individual commands still elevate one at a time — nothing runs as root
+# between sudo calls.
+request_sudo() {
+    echo "==> requesting sudo access (asked once, kept alive for this run)"
+    sudo -v
+    ( while kill -0 "$$" 2>/dev/null; do sudo -n -v 2>/dev/null; sleep 60; done ) &
+    SUDO_KEEPALIVE_PID=$!
+    trap 'kill "$SUDO_KEEPALIVE_PID" 2>/dev/null' EXIT
+}
+
 confirm_github_config() {
     echo "================================================================"
     echo "github configuration"
@@ -39,6 +50,8 @@ confirm_github_config() {
 }
 
 main() {
+    request_sudo
+
     bash "$SCRIPT_DIR/applications/homelab.sh"
     bash "$SCRIPT_DIR/applications/hermes.sh"
     bash "$SCRIPT_DIR/applications/desktop.sh"

@@ -25,6 +25,16 @@ if ! command -v sudo > /dev/null 2>&1; then
     exit 1
 fi
 
+# ask for sudo once up front and keep the ticket fresh for the whole run
+# (no-op prompt when already primed by setup.sh). individual commands still
+# elevate one at a time — nothing runs as root between sudo calls.
+request_sudo() {
+    sudo -v
+    ( while kill -0 "$$" 2>/dev/null; do sudo -n -v 2>/dev/null; sleep 60; done ) &
+    SUDO_KEEPALIVE_PID=$!
+    trap 'kill "$SUDO_KEEPALIVE_PID" 2>/dev/null' EXIT
+}
+
 MODEL_KEY="qwen/qwen3.6-35b-a3b"          # https://lmstudio.ai/models/qwen/qwen3.6-35b-a3b
 LMS_BIN="$HOME/.lmstudio/bin/lms"
 LMS_ENDPOINT="http://localhost:1234/v1"   # lm studio server default port
@@ -250,6 +260,7 @@ EOF
 # main
 # ---------------------------------------------------------------
 main() {
+    request_sudo
     install_lmstudio
     download_qwen_model
     setup_lmstudio_service
