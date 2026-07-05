@@ -82,6 +82,7 @@ pages:
                     title: Ars Technica
 
           - type: videos
+            title: YouTube
             style: grid-cards
             collapse-after-rows: 2
             channels:
