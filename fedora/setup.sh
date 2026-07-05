@@ -113,26 +113,44 @@ setup_tailnet() {
         sudo tailscale up
     fi
 
-    echo "==> serving homelab services on the tailnet (https)"
-    # tailnet-only https; certs are auto-provisioned. requires magicdns +
-    # https enabled on the tailnet: https://tailscale.com/kb/1153/enabling-https
-    sudo tailscale serve --bg --https=443  http://localhost:8181 > /dev/null # glance
-    sudo tailscale serve --bg --https=8080 http://localhost:8080 > /dev/null # open webui
-    sudo tailscale serve --bg --https=9119 http://localhost:9119 > /dev/null # hermes dashboard
-    sudo tailscale serve --bg --https=8765 http://localhost:8765 > /dev/null # speedtest tracker
-    sudo tailscale serve --bg --https=1234 http://localhost:1234 > /dev/null # lm studio api
-
     local ts_name
     ts_name="$(tailscale status --json | jq -r '.Self.DNSName' | sed 's/\.$//')"
 
+    # rebind the hermes dashboard to the tailnet dns name (it validates the
+    # Host header, so it cannot sit behind `tailscale serve` — see hermes.sh)
+    bash "$SCRIPT_DIR/applications/hermes.sh" dashboard-service
+
+    # services bind 0.0.0.0, so they are directly reachable on the tailnet
+    # over plain http (wireguard encrypts transport). `tailscale serve` is
+    # NOT used: its https proxies lose to the direct plaintext listeners on
+    # the same ports and its state breaks on machine renames — clear any
+    # entries left over from previous setups
+    sudo tailscale serve reset > /dev/null 2>&1 || true
+
+    # point the glance links and caddy https proxy at the tailnet dns name
+    # (read from docker/config/.env, git-ignored) and apply. caddy fetches
+    # .ts.net certs from tailscaled — requires magicdns + https enabled on
+    # the tailnet: https://tailscale.com/kb/1153/enabling-https
+    local docker_env="$SCRIPT_DIR/docker/config/.env"
+    touch "$docker_env"
+    sed -i '/^TS_DNS_NAME=/d;/^TS_SCHEME=/d;/^SPEEDTEST_APP_URL=/d;/^APP_URL=/d' "$docker_env"
+    printf 'TS_DNS_NAME=%s\nAPP_URL=https://%s:7443\n' "$ts_name" "$ts_name" >> "$docker_env"
+    if docker info > /dev/null 2>&1; then
+        docker compose -f "$SCRIPT_DIR/docker/docker-compose.yml" up -d > /dev/null 2>&1
+    else
+        sudo docker compose -f "$SCRIPT_DIR/docker/docker-compose.yml" up -d > /dev/null 2>&1
+    fi
+
     echo "================================================================"
-    echo "homelab services — reachable from any device on your tailnet:"
+    echo "homelab services — reachable from any device on your tailnet"
+    echo "(https via caddy; plain-http fallbacks stay on the original ports)"
     echo "----------------------------------------------------------------"
     echo "glance dashboard:   https://${ts_name}/"
-    echo "open webui (chat):  https://${ts_name}:8080/"
-    echo "hermes dashboard:   https://${ts_name}:9119/"
-    echo "speedtest tracker:  https://${ts_name}:8765/"
-    echo "lm studio api:      https://${ts_name}:1234/v1"
+    echo "open webui (chat):  https://${ts_name}:8443/"
+    echo "hermes dashboard:   https://${ts_name}:9443/"
+    echo "                    (login: HERMES_DASHBOARD_BASIC_AUTH_* in ~/.hermes/.env)"
+    echo "speedtest tracker:  https://${ts_name}:7443/"
+    echo "lm studio api:      https://${ts_name}:5443/v1"
     echo "================================================================"
 }
 
@@ -157,6 +175,13 @@ main() {
     mkdir -p "$DESKTOP_DIR"
     echo "homelab setup — $(date)" > "$LOG_FILE"
 
+    # clear stale tailscale serve state BEFORE services start — leftover
+    # https proxies hold ports (e.g. 1234) and block the lm studio bind.
+    # setup_tailnet also resets at the end; this covers re-runs.
+    if command -v tailscale > /dev/null 2>&1; then
+        sudo tailscale serve reset > /dev/null 2>&1 || true
+    fi
+
     echo
     echo "homelab setup"
     echo "full install logs: $LOG_FILE"
@@ -164,9 +189,12 @@ main() {
     run_step "base system (homelab.sh)" "bash $SCRIPT_DIR/applications/homelab.sh"
     run_step "ai agent stack (hermes.sh)" "bash $SCRIPT_DIR/applications/hermes.sh"
     run_step "desktop applications (desktop.sh)" "bash $SCRIPT_DIR/applications/desktop.sh"
-    # docker group membership needs a re-login; fall back to sudo until then
+    # docker group membership needs a re-login; fall back to sudo until then.
+    # seed config/.env so the containers start with localhost urls before
+    # the tailnet step rewrites it with the real dns name
     run_step "web services (docker compose)" "\
-        echo '==> starting web services (open-webui, glance)'; \
+        echo '==> starting web services (open-webui, glance, speedtest, caddy)'; \
+        [ -f $SCRIPT_DIR/docker/config/.env ] || printf 'TS_DNS_NAME=localhost\n' > $SCRIPT_DIR/docker/config/.env; \
         if docker info > /dev/null 2>&1; then \
             docker compose -f $SCRIPT_DIR/docker/docker-compose.yml up -d; \
         else \

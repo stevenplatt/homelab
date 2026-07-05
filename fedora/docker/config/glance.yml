@@ -28,18 +28,21 @@ pages:
           - type: search
             autofocus: true
 
+          # TS_DNS_NAME comes from the container env (set by setup.sh via
+          # docker/config/.env) so links work from any tailnet device. urls go
+          # through the caddy https proxy — port map in ./Caddyfile (same folder)
           - type: monitor
             cache: 1m
             title: Services
             sites:
               - title: Open WebUI (chat)
-                url: http://localhost:8080
+                url: https://${TS_DNS_NAME}:8443
               - title: Hermes dashboard
-                url: http://localhost:9119
+                url: https://${TS_DNS_NAME}:9443
               - title: LM Studio API
-                url: http://localhost:1234/v1/models
+                url: https://${TS_DNS_NAME}:5443/v1/models
               - title: Speedtest Tracker
-                url: http://localhost:8765
+                url: https://${TS_DNS_NAME}:7443
 
           - type: bookmarks
             groups:
@@ -111,13 +114,13 @@ pages:
             cache: 1m
             sites:
               - title: open webui (chat)
-                url: http://localhost:8080
+                url: https://${TS_DNS_NAME}:8443
               - title: hermes dashboard
-                url: http://localhost:9119
+                url: https://${TS_DNS_NAME}:9443
               - title: lm studio api
-                url: http://localhost:1234/v1/models
+                url: https://${TS_DNS_NAME}:5443/v1/models
               - title: speedtest tracker
-                url: http://localhost:8765
+                url: https://${TS_DNS_NAME}:7443
 
           - type: group
             widgets:
@@ -153,11 +156,11 @@ pages:
               - title: homelab
                 links:
                   - title: open webui (chat)
-                    url: http://localhost:8080
+                    url: https://${TS_DNS_NAME}:8443
                   - title: hermes dashboard
-                    url: http://localhost:9119
+                    url: https://${TS_DNS_NAME}:9443
                   - title: speedtest tracker
-                    url: http://localhost:8765
+                    url: https://${TS_DNS_NAME}:7443
                   - title: homelab repo
                     url: https://github.com/stevenplatt/homelab
 
@@ -171,15 +174,6 @@ pages:
                 name: Google
               - symbol: SPCX
                 name: SpaceX
-
-          - type: releases
-            cache: 1d
-            repositories:
-              - glanceapp/glance
-              - open-webui/open-webui
-              - NousResearch/hermes-agent
-              - badlogic/pi-mono
-              - alexjustesen/speedtest-tracker
 
   - name: Markets
     width: wide

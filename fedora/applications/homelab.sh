@@ -177,6 +177,7 @@ install_devops_packages() {
         curl \
         jq \
         unzip \
+        tmux \
         flatpak \
         google-cloud-cli \
         terraform \

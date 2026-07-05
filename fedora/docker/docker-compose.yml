@@ -25,13 +25,18 @@ services:
   glance:
     image: glanceapp/glance:latest
     container_name: glance
-    # host networking so the monitor widget's localhost urls are valid both
-    # for health checks (from the container) and clicks (from the browser).
-    # listens on 8181 via server.port in glance.yml
+    # host networking so the monitor widget's urls are valid both for
+    # health checks (from the container) and clicks (from the browser).
+    # listens on 8181 via server.port in config/glance.yml
     network_mode: host
     volumes:
-      # config lives in the repo — edit glance.yml and re-run setup.sh
-      - ./glance.yml:/app/config/glance.yml:ro
+      # config lives in the repo — edit and re-run setup.sh
+      - ./config/glance.yml:/app/config/glance.yml:ro
+    env_file:
+      # TS_DNS_NAME — written by setup.sh once the tailnet is joined
+      # (git-ignored; seeded with localhost before that)
+      - path: ./config/.env
+        required: false
     restart: unless-stopped
 
   speedtest-tracker:
@@ -48,8 +53,33 @@ services:
       # laravel encryption key for the local speedtest db — rotate if desired
       - APP_KEY=base64:fBxcn/qHsMDWOHDhy3rkDIUJVIYcFS5ta4SxWXclS4Y=
       - SPEEDTEST_SCHEDULE=0 * * * * # run a speedtest hourly
+    env_file:
+      # APP_URL (the canonical url behind the caddy https proxy — laravel
+      # generates asset links from it) — written by setup.sh
+      - path: ./config/.env
+        required: false
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    # host networking: backends live on host ports / the tailscale ip, and
+    # caddy needs tailscaled's socket to fetch .ts.net certificates
+    network_mode: host
+    volumes:
+      # config lives in the repo — edit and re-run setup.sh
+      - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
+    env_file:
+      # TS_DNS_NAME — written by setup.sh once the tailnet is joined
+      - path: ./config/.env
+        required: false
     restart: unless-stopped
 
 volumes:
   open-webui-data:
   speedtest-data:
+  caddy-data:
+  caddy-config:

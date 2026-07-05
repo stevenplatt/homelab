@@ -1,0 +1,37 @@
+# https reverse proxy for the homelab services — version-controlled here and
+# bind-mounted into the caddy container by docker-compose.yml.
+#
+# {$TS_DNS_NAME} is injected from config/.env (written by ../../setup.sh once
+# the tailnet is joined). caddy recognizes .ts.net hostnames and fetches
+# real certificates from tailscaled automatically (socket mounted in
+# docker-compose.yml; requires magicdns + https enabled on the tailnet:
+# https://tailscale.com/kb/1153/enabling-https).
+#
+# port map (backends stay plain http on their original ports):
+#   443  → glance            (localhost:8181)
+#   8443 → open webui        (localhost:8080)
+#   9443 → hermes dashboard  (tailnet-bound :9119)
+#   7443 → speedtest tracker (localhost:8765)
+#   5443 → lm studio api     (localhost:1234)
+
+{$TS_DNS_NAME} {
+	reverse_proxy localhost:8181
+}
+
+{$TS_DNS_NAME}:8443 {
+	reverse_proxy localhost:8080
+}
+
+{$TS_DNS_NAME}:9443 {
+	# hermes binds the tailnet dns name (not loopback) and validates the
+	# Host header — caddy preserves the original Host, which matches
+	reverse_proxy {$TS_DNS_NAME}:9119
+}
+
+{$TS_DNS_NAME}:7443 {
+	reverse_proxy localhost:8765
+}
+
+{$TS_DNS_NAME}:5443 {
+	reverse_proxy localhost:1234
+}

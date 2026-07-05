@@ -39,6 +39,7 @@ request_sudo() {
 }
 
 MODEL_KEY="qwen/qwen3.6-35b-a3b"          # https://lmstudio.ai/models/qwen/qwen3.6-35b-a3b
+MODEL_ALIAS="homelab-qwen3.6"             # id served on the api — what open webui/hermes/pi display and request
 LMS_BIN="$HOME/.lmstudio/bin/lms"
 LMS_ENDPOINT="http://localhost:1234/v1"   # lm studio server default port
 
@@ -172,7 +173,7 @@ Description=LM Studio Server
 Type=oneshot
 RemainAfterExit=yes
 ExecStartPre=$LMS_BIN daemon up
-ExecStartPre=$LMS_BIN load $MODEL_KEY --yes
+ExecStartPre=/bin/bash -c '$LMS_BIN ps | grep -q "$MODEL_ALIAS" || $LMS_BIN load $MODEL_KEY --identifier $MODEL_ALIAS --yes'
 ExecStart=$LMS_BIN server start --bind 0.0.0.0
 ExecStop=$LMS_BIN daemon down
 
@@ -230,9 +231,29 @@ configure_hermes() {
     hermes_bin="$(command -v hermes || echo "$HOME/.local/bin/hermes")"
 
     # lm studio is a first-class hermes provider (defaults to
-    # http://127.0.0.1:1234/v1) — see the model section of ~/.hermes/config.yaml
+    # http://127.0.0.1:1234/v1) — see the model section of ~/.hermes/config.yaml.
+    # the alias matches the --identifier the systemd unit loads the model with
     "$hermes_bin" config set model.provider lmstudio
-    "$hermes_bin" config set model.default "$MODEL_KEY"
+    "$hermes_bin" config set model.default "$MODEL_ALIAS"
+}
+
+# the dashboard's basic-auth provider is required for any non-loopback bind
+# (hermes fails closed without it). generates credentials once into
+# ~/.hermes/.env; env var names from:
+# https://hermes-agent.nousresearch.com/docs/user-guide/features/web-dashboard
+ensure_dashboard_auth() {
+    local env_file="$HOME/.hermes/.env"
+    mkdir -p "$HOME/.hermes"
+
+    if ! grep -q '^HERMES_DASHBOARD_BASIC_AUTH_USERNAME=' "$env_file" 2>/dev/null; then
+        {
+            echo "HERMES_DASHBOARD_BASIC_AUTH_USERNAME=admin"
+            echo "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=$(openssl rand -base64 16)"
+            echo "HERMES_DASHBOARD_BASIC_AUTH_SECRET=$(openssl rand -base64 32)"
+        } >> "$env_file"
+        chmod 600 "$env_file"
+        echo "dashboard basic-auth credentials generated in $env_file"
+    fi
 }
 
 setup_hermes_dashboard_service() {
@@ -241,9 +262,24 @@ setup_hermes_dashboard_service() {
     local hermes_bin
     hermes_bin="$(command -v hermes || echo "$HOME/.local/bin/hermes")"
 
+    # hermes rejects requests whose Host header differs from the bound host
+    # (dns-rebinding defence — no allowlist exists), so proxying it through
+    # `tailscale serve` cannot work. instead bind the tailnet dns name
+    # directly when joined; that requires the basic-auth provider.
+    local dash_host="127.0.0.1" ts_name=""
+    if command -v tailscale > /dev/null 2>&1 && tailscale status > /dev/null 2>&1; then
+        ts_name="$(tailscale status --json | jq -r '.Self.DNSName' | sed 's/\.$//')"
+    fi
+    if [[ -n "$ts_name" ]]; then
+        dash_host="$ts_name"
+        ensure_dashboard_auth
+        echo "dashboard will bind the tailnet dns name: http://${dash_host}:9119"
+    fi
+
     # systemd user service (same selinux reasoning as the lm studio unit);
     # lingering — enabled in setup_lmstudio_service — starts it at boot.
-    # dashboard serves http://127.0.0.1:9119
+    # Restart/RestartSec also cover boot ordering: the bind fails until
+    # tailscaled is up, then succeeds on retry.
     local unit_dir="$HOME/.config/systemd/user"
     local unit_path="$unit_dir/hermes-dashboard.service"
     local tmp_unit
@@ -256,7 +292,8 @@ setup_hermes_dashboard_service() {
 Description=Hermes Agent Dashboard
 
 [Service]
-ExecStart=$hermes_bin dashboard --no-open
+EnvironmentFile=-%h/.hermes/.env
+ExecStart=$hermes_bin dashboard --no-open --host $dash_host
 Restart=on-failure
 RestartSec=10
 
@@ -264,13 +301,18 @@ RestartSec=10
 WantedBy=default.target
 EOF
 
+    local unit_changed=0
     if ! cmp -s "$tmp_unit" "$unit_path" 2>/dev/null; then
         cp "$tmp_unit" "$unit_path"
         systemctl --user daemon-reload
+        unit_changed=1
     fi
     rm -f "$tmp_unit"
 
     systemctl --user enable --now hermes-dashboard.service
+    if [[ "$unit_changed" -eq 1 ]]; then
+        systemctl --user restart hermes-dashboard.service
+    fi
 }
 
 configure_hermes_slack() {
@@ -367,7 +409,7 @@ EOF
         command -v jq > /dev/null 2>&1 || sudo dnf install -y jq
         local tmp_settings
         tmp_settings="$(mktemp)"
-        jq --arg model "$MODEL_KEY" \
+        jq --arg model "$MODEL_ALIAS" \
             '.defaultProvider = "lmstudio" | .defaultModel = $model' \
             "$settings" > "$tmp_settings"
         mv "$tmp_settings" "$settings"
@@ -375,7 +417,7 @@ EOF
         cat > "$settings" <<EOF
 {
   "defaultProvider": "lmstudio",
-  "defaultModel": "$MODEL_KEY"
+  "defaultModel": "$MODEL_ALIAS"
 }
 EOF
     fi
@@ -396,7 +438,13 @@ main() {
     install_pi
     configure_pi
 
-    echo "==> hermes stack ready — endpoint: $LMS_ENDPOINT (model: $MODEL_KEY)"
+    echo "==> hermes stack ready — endpoint: $LMS_ENDPOINT (model: $MODEL_ALIAS)"
 }
 
-main "$@"
+# `hermes.sh dashboard-service` re-runs only the dashboard unit setup —
+# used by setup.sh to rebind the dashboard right after the tailnet is joined
+if [[ "${1:-}" == "dashboard-service" ]]; then
+    setup_hermes_dashboard_service
+else
+    main "$@"
+fi

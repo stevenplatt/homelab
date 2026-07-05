@@ -16,17 +16,17 @@ Configuration scripts for my personal homelab: workstation provisioning, local A
 - [`homelab.sh`](fedora/applications/homelab.sh) — base system: SSH key, git identity, Homebrew, devops tooling, remote desktop (GNOME RDP on port 3389; prompts once for credentials — the session must be logged in, so enable GNOME auto-login for unattended access), and [Tailscale](https://tailscale.com/) (at boot)
 - [`hermes.sh`](fedora/applications/hermes.sh) — fully local AI agents, no cloud accounts: LM Studio (headless, at boot) serving Qwen, with [Hermes](https://hermes-agent.nousresearch.com/) and [pi](https://pi.dev/) pointed at it; the Hermes web dashboard runs at boot
 - [`desktop.sh`](fedora/applications/desktop.sh) — desktop apps: VS Code and Steam (RPM), Slack, Flatseal, Zotero (Flathub)
-- [`docker/docker-compose.yml`](fedora/docker/docker-compose.yml) — containerized web services: [Open WebUI](https://github.com/open-webui/open-webui) (browser chat against the LM Studio endpoint) and the [Glance](https://github.com/glanceapp/glance) dashboard, whose config is version-controlled at [`docker/glance.yml`](fedora/docker/glance.yml)
+- [`docker/docker-compose.yml`](fedora/docker/docker-compose.yml) — containerized web services: [Open WebUI](https://github.com/open-webui/open-webui) (browser chat against the LM Studio endpoint) and the [Glance](https://github.com/glanceapp/glance) dashboard, whose config is version-controlled in [`docker/config/`](fedora/docker/config/)
 
 ### Web services
 
-After setup, these are reachable in a browser (localhost, or over your tailnet via `tailscale serve`):
+After setup, these are reachable in a browser (localhost locally, or over your tailnet via the HTTPS addresses below):
 
 | Service | Address | Login | What it's for |
 | --- | --- | --- | --- |
 | Glance | [http://localhost:8181](http://localhost:8181) | none | Homelab dashboard: service health, bookmarks |
 | Open WebUI | [http://localhost:8080](http://localhost:8080) | none (auth disabled) | Browser chat with the local Qwen model |
-| Hermes dashboard | [http://localhost:9119](http://localhost:9119) | none | Hermes config, API keys, sessions |
+| Hermes dashboard | [http://localhost:9119](http://localhost:9119) (moves to `http://<machine>.<tailnet>.ts.net:9119` once the tailnet is joined) | none on localhost; basic auth on the tailnet (credentials in `~/.hermes/.env`) | Hermes config, API keys, sessions |
 | Speedtest Tracker | [http://localhost:8765](http://localhost:8765) | `admin@example.com` / `password` — change it | Hourly internet speed tests with history graphs |
 | LM Studio API | [http://localhost:1234/v1](http://localhost:1234/v1) | none | OpenAI-compatible inference endpoint (API, not a UI) |
 
@@ -44,17 +44,19 @@ When finished it prints your git identity and SSH public key for pasting into [g
 
 Two things need a one-time manual step after `setup.sh` finishes.
 
-**Tailscale** — setup.sh handles this at the end of its run: it runs `sudo tailscale up` (which prints a login URL — open it in a browser to authenticate, first run only), then uses Tailscale Serve to publish every homelab service over HTTPS to your tailnet, and prints the resulting URLs. Services stay bound to localhost — nothing is exposed publicly. From any device on your tailnet:
+**Tailscale** — setup.sh handles this at the end of its run: it runs `sudo tailscale up` (which prints a login URL — open it in a browser to authenticate, first run only) and prints the tailnet URLs for every service. HTTPS is terminated by a [Caddy](https://caddyserver.com/) container ([`fedora/docker/config/Caddyfile`](fedora/docker/config/Caddyfile)) that fetches real `.ts.net` certificates from tailscaled automatically — this requires [MagicDNS and HTTPS enabled](https://tailscale.com/kb/1153/enabling-https) on your tailnet (admin console → DNS). From any device on your tailnet:
 
-| Service | Tailnet address |
-| --- | --- |
-| Glance | `https://<machine>.<tailnet>.ts.net/` |
-| Open WebUI | `https://<machine>.<tailnet>.ts.net:8080/` |
-| Hermes dashboard | `https://<machine>.<tailnet>.ts.net:9119/` |
-| Speedtest Tracker | `https://<machine>.<tailnet>.ts.net:8765/` |
-| LM Studio API | `https://<machine>.<tailnet>.ts.net:1234/v1` |
+| Service | HTTPS (Caddy) | Plain-http fallback |
+| --- | --- | --- |
+| Glance | `https://<machine>.<tailnet>.ts.net/` | `:8181` |
+| Open WebUI | `https://<machine>.<tailnet>.ts.net:8443/` | `:8080` |
+| Hermes dashboard | `https://<machine>.<tailnet>.ts.net:9443/` | `:9119` |
+| Speedtest Tracker | `https://<machine>.<tailnet>.ts.net:7443/` | `:8765` |
+| LM Studio API | `https://<machine>.<tailnet>.ts.net:5443/v1` | `:1234/v1` |
 
-setup.sh prints these with your machine's actual MagicDNS name filled in. Requires [MagicDNS and HTTPS enabled](https://tailscale.com/kb/1153/enabling-https) on your tailnet (Tailscale admin console → DNS) — certificates are then provisioned automatically.
+setup.sh prints these with your machine's actual MagicDNS name filled in. Caddy's HTTPS ports are deliberately different from the backends' — the backends keep their plain-http listeners (traffic is WireGuard-encrypted on the tailnet either way; HTTPS adds browser secure-context features like microphone access for Open WebUI's voice input). Tailscale Serve is deliberately not used — its proxies conflict with services listening directly on the same ports; setup.sh clears any leftover serve configuration.
+
+The Hermes dashboard additionally validates the Host header (a DNS-rebinding defence), so setup.sh binds it to the tailnet DNS name directly, which engages Hermes' basic-auth gate — the username/password are generated once into `~/.hermes/.env` (`HERMES_DASHBOARD_BASIC_AUTH_*`). Caddy preserves the Host header, so the check passes through the proxy. The Glance dashboard links use the HTTPS addresses automatically (via `fedora/docker/config/.env`), so they work from any tailnet device.
 
 **Hermes ↔ Slack** uses Slack Socket Mode — an outbound connection from the machine, so no Tailscale, ports, or Nous account are involved. Create the Slack app once by hand: run `hermes slack manifest --write`, paste the manifest at [api.slack.com/apps](https://api.slack.com/apps) (create new app → from manifest), and install it to your workspace. Then export the tokens and re-run setup:
 
@@ -77,7 +79,7 @@ Some first requests to try (terminal or Slack):
 
 > watch the file ~/Desktop/homelab.log and tell me if any service failed
 
-> clone github.com/glanceapp/glance, read the widget docs, and suggest three widgets for fedora/docker/glance.yml in my homelab repo
+> clone github.com/glanceapp/glance, read the widget docs, and suggest three widgets for fedora/docker/config/glance.yml in my homelab repo
 
 > every weekday at 8am, check my kind cluster is healthy and message me on slack if not
 
