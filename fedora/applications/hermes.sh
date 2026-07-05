@@ -173,20 +173,33 @@ Type=oneshot
 RemainAfterExit=yes
 ExecStartPre=$LMS_BIN daemon up
 ExecStartPre=$LMS_BIN load $MODEL_KEY --yes
-ExecStart=$LMS_BIN server start
+ExecStart=$LMS_BIN server start --bind 0.0.0.0
 ExecStop=$LMS_BIN daemon down
 
 [Install]
 WantedBy=default.target
 EOF
 
+    # --bind 0.0.0.0: docker containers (open-webui, glance) reach the
+    # endpoint via host.docker.internal, which arrives on the docker bridge —
+    # a 127.0.0.1 bind refuses those connections. loopback clients
+    # (hermes, pi) are unaffected. note this also exposes the port on the
+    # lan; fedora workstation's default firewall zone permits it.
+    local unit_changed=0
     if ! cmp -s "$tmp_unit" "$unit_path" 2>/dev/null; then
         cp "$tmp_unit" "$unit_path"
         systemctl --user daemon-reload
+        unit_changed=1
     fi
     rm -f "$tmp_unit"
 
     systemctl --user enable --now lmstudio.service
+
+    # enable --now does not restart an already-running service, so apply
+    # unit changes explicitly
+    if [[ "$unit_changed" -eq 1 ]]; then
+        systemctl --user restart lmstudio.service
+    fi
 
     # start the user service at boot without waiting for a login
     sudo loginctl enable-linger "$CURRENT_USER"

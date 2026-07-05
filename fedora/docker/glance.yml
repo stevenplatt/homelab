@@ -1,28 +1,79 @@
 # glance dashboard config — version-controlled here and bind-mounted into
 # the glance container by docker-compose.yml. edit, then re-run ../setup.sh
 # (or `docker compose restart glance`) to apply.
-# widget reference: https://github.com/glanceapp/glance/blob/main/docs/configuration.md
 #
-# host services are reached via host.docker.internal (mapped to the host
-# gateway in docker-compose.yml); container services by their compose name.
+# layout is glance's official example dashboard with the homelab services
+# integrated (monitor + bookmarks + releases). the container uses host
+# networking, so all urls are plain localhost — valid for both the health
+# checks and clicking through from the browser.
+# widget reference: https://github.com/glanceapp/glance/blob/main/docs/configuration.md
 server:
-  port: 8080
+  port: 8181
 
 pages:
   - name: Home
     columns:
+      - size: small
+        widgets:
+          - type: calendar
+            first-day-of-week: monday
+
+          - type: rss
+            limit: 10
+            collapse-after: 3
+            cache: 12h
+            feeds:
+              - url: https://selfh.st/rss/
+                title: selfh.st
+                limit: 4
+              - url: https://ciechanow.ski/atom.xml
+              - url: https://www.joshwcomeau.com/rss.xml
+                title: Josh Comeau
+              - url: https://samwho.dev/rss.xml
+              - url: https://ishadeed.com/feed.xml
+                title: Ahmad Shadeed
+
       - size: full
         widgets:
           - type: monitor
             title: homelab services
             cache: 1m
             sites:
-              - title: lm studio api
-                url: http://host.docker.internal:1234/v1/models
+              - title: open webui (chat)
+                url: http://localhost:8080
               - title: hermes dashboard
-                url: http://host.docker.internal:9119
-              - title: open webui
-                url: http://open-webui:8080
+                url: http://localhost:9119
+              - title: lm studio api
+                url: http://localhost:1234/v1/models
+
+          - type: group
+            widgets:
+              - type: hacker-news
+              - type: lobsters
+
+          - type: videos
+            channels:
+              - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
+              - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
+              - UCsBjURrPoezykLs9EqgamOA # Fireship
+              - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
+              - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+
+          - type: group
+            widgets:
+              - type: reddit
+                subreddit: technology
+                show-thumbnails: true
+              - type: reddit
+                subreddit: selfhosted
+                show-thumbnails: true
+
+      - size: small
+        widgets:
+          - type: weather
+            location: San Francisco, United States # change to your city
+            units: imperial
+            hour-format: 12h
 
           - type: bookmarks
             groups:
@@ -34,3 +85,22 @@ pages:
                     url: http://localhost:9119
                   - title: homelab repo
                     url: https://github.com/stevenplatt/homelab
+
+          - type: markets
+            markets:
+              - symbol: VOO
+                name: Vanguard S&P 500
+              - symbol: SMH
+                name: VanEck Semiconductor
+              - symbol: GOOD
+                name: Google
+              - symbol: SPCX
+                name: SpaceX
+
+          - type: releases
+            cache: 1d
+            repositories:
+              - glanceapp/glance
+              - open-webui/open-webui
+              - NousResearch/hermes-agent
+              - badlogic/pi-mono
