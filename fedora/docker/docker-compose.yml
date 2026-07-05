@@ -49,6 +49,10 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      # pacific time (handles PST/PDT automatically); TZ for the container,
+      # APP_TIMEZONE for the laravel app's displayed times and schedule
+      - TZ=America/Los_Angeles
+      - APP_TIMEZONE=America/Los_Angeles
       - DB_CONNECTION=sqlite
       # laravel encryption key for the local speedtest db — rotate if desired
       - APP_KEY=base64:fBxcn/qHsMDWOHDhy3rkDIUJVIYcFS5ta4SxWXclS4Y=

@@ -95,22 +95,63 @@ pages:
           - type: calendar
             first-day-of-week: monday
 
-          - type: rss
-            limit: 10
-            collapse-after: 3
-            cache: 12h
-            feeds:
-              - url: https://selfh.st/rss/
-                title: selfh.st
-                limit: 4
-              - url: https://ciechanow.ski/atom.xml
-              - url: https://www.joshwcomeau.com/rss.xml
-                title: Josh Comeau
-              - url: https://samwho.dev/rss.xml
-              - url: https://ishadeed.com/feed.xml
-                title: Ahmad Shadeed
+          - type: weather
+            location: San Francisco, United States # change to your city
+            units: imperial
+            hour-format: 12h
+
+          - type: markets
+            markets:
+              - symbol: VOO
+                name: Vanguard S&P 500
+              - symbol: SMH
+                name: VanEck Semiconductor
+              - symbol: GOOD
+                name: Google
+              - symbol: SPCX
+                name: SpaceX
 
       - size: full
+        widgets:
+          # collapse-after lives on the widgets inside a group — the group
+          # widget itself doesn't support it
+          - type: group
+            widgets:
+              - type: hacker-news
+              - type: lobsters
+
+          - type: group
+            widgets:
+              - type: rss
+                title: Reuters
+                limit: 10
+                feeds:
+                  - url: "https://news.google.com/rss/search?q=site:reuters.com&hl=en-US&gl=US&ceid=US:en"
+                    title: Reuters
+              - type: rss
+                title: Engadget
+                limit: 10
+                feeds:
+                  - url: https://www.engadget.com/rss.xml
+                    title: Engadget
+              - type: rss
+                title: Ars Technica
+                limit: 10
+                feeds:
+                  - url: https://feeds.arstechnica.com/arstechnica/index
+                    title: Ars Technica
+
+          - type: videos
+            style: grid-cards
+            collapse-after-rows: 2
+            channels:
+              - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
+              - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
+              - UCsBjURrPoezykLs9EqgamOA # Fireship
+              - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
+              - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+
+      - size: small
         widgets:
           - type: monitor
             title: homelab services
@@ -128,26 +169,6 @@ pages:
               - title: speedtest tracker
                 url: https://${TS_DNS_NAME}:7443
 
-          - type: group
-            widgets:
-              - type: hacker-news
-              - type: lobsters
-
-          - type: videos
-            channels:
-              - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
-              - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
-              - UCsBjURrPoezykLs9EqgamOA # Fireship
-              - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
-              - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
-
-      - size: small
-        widgets:
-          - type: weather
-            location: San Francisco, United States # change to your city
-            units: imperial
-            hour-format: 12h
-
           - type: bookmarks
             groups:
               - title: homelab
@@ -160,85 +181,3 @@ pages:
                     url: https://${TS_DNS_NAME}:7443
                   - title: homelab repo
                     url: https://github.com/stevenplatt/homelab
-
-          - type: markets
-            markets:
-              - symbol: VOO
-                name: Vanguard S&P 500
-              - symbol: SMH
-                name: VanEck Semiconductor
-              - symbol: GOOD
-                name: Google
-              - symbol: SPCX
-                name: SpaceX
-
-  - name: Markets
-    width: wide
-    columns:
-      - size: small
-        widgets:
-          - type: markets
-            title: Indices
-            markets:
-              - symbol: SPY
-                name: S&P 500
-              - symbol: DX-Y.NYB
-                name: Dollar Index
-
-          - type: markets
-            title: Crypto
-            markets:
-              - symbol: BTC-USD
-                name: Bitcoin
-              - symbol: ETH-USD
-                name: Ethereum
-
-          - type: markets
-            title: Stocks
-            sort-by: absolute-change
-            markets:
-              - symbol: NVDA
-                name: NVIDIA
-              - symbol: AAPL
-                name: Apple
-              - symbol: MSFT
-                name: Microsoft
-              - symbol: GOOGL
-                name: Google
-              - symbol: AMD
-                name: AMD
-              - symbol: RDDT
-                name: Reddit
-              - symbol: AMZN
-                name: Amazon
-              - symbol: TSLA
-                name: Tesla
-              - symbol: INTC
-                name: Intel
-              - symbol: META
-                name: Meta
-
-      - size: full
-        widgets:
-          - type: videos
-            style: grid-cards
-            collapse-after-rows: 3
-            channels:
-              - UCvSXMi2LebwJEM1s4bz5IBA
-              - UCV6KDgJskWaEckne5aPA0aQ
-              - UCAzhpt9DmG6PnHXjmJTvRGQ
-
-      - size: small
-        widgets:
-          # reuters has no native rss — google news site-filtered feeds
-          # link directly to reuters.com articles
-          - type: rss
-            title: News
-            limit: 30
-            collapse-after: 13
-            feeds:
-              - url: "https://news.google.com/rss/search?q=site:reuters.com+markets&hl=en-US&gl=US&ceid=US:en"
-                title: Reuters Markets
-              - url: "https://news.google.com/rss/search?q=site:reuters.com+business&hl=en-US&gl=US&ceid=US:en"
-                title: Reuters Business
-
