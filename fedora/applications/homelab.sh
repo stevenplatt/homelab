@@ -364,6 +364,14 @@ install_tailscale() {
 
     sudo systemctl enable --now tailscaled
 
+    # trust the tailnet interface in firewalld — the default workstation
+    # zone rejects ports below 1025 (e.g. caddy's 443) from other devices.
+    # the tailnet itself is the auth boundary; lan/wifi rules are untouched
+    if [[ "$(sudo firewall-cmd --get-zone-of-interface=tailscale0 2>/dev/null)" != "trusted" ]]; then
+        sudo firewall-cmd --permanent --zone=trusted --add-interface=tailscale0
+        sudo firewall-cmd --reload
+    fi
+
     # joining the tailnet needs a one-time browser login — see the readme
     if ! tailscale status > /dev/null 2>&1; then
         echo "tailscale installed but not authenticated — run: sudo tailscale up"
