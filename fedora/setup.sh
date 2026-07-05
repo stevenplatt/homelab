@@ -100,6 +100,42 @@ run_step() {
     fi
 }
 
+# join the tailnet and expose the homelab services over it. runs after the
+# tui because first-time auth prints a login url the user must open.
+setup_tailnet() {
+    if ! command -v tailscale > /dev/null 2>&1; then
+        echo "tailscale not installed — skipping tailnet setup"
+        return 0
+    fi
+
+    if ! tailscale status > /dev/null 2>&1; then
+        echo "==> joining the tailnet — open the login url below in a browser"
+        sudo tailscale up
+    fi
+
+    echo "==> serving homelab services on the tailnet (https)"
+    # tailnet-only https; certs are auto-provisioned. requires magicdns +
+    # https enabled on the tailnet: https://tailscale.com/kb/1153/enabling-https
+    sudo tailscale serve --bg --https=443  http://localhost:8181 > /dev/null # glance
+    sudo tailscale serve --bg --https=8080 http://localhost:8080 > /dev/null # open webui
+    sudo tailscale serve --bg --https=9119 http://localhost:9119 > /dev/null # hermes dashboard
+    sudo tailscale serve --bg --https=8765 http://localhost:8765 > /dev/null # speedtest tracker
+    sudo tailscale serve --bg --https=1234 http://localhost:1234 > /dev/null # lm studio api
+
+    local ts_name
+    ts_name="$(tailscale status --json | jq -r '.Self.DNSName' | sed 's/\.$//')"
+
+    echo "================================================================"
+    echo "homelab services — reachable from any device on your tailnet:"
+    echo "----------------------------------------------------------------"
+    echo "glance dashboard:   https://${ts_name}/"
+    echo "open webui (chat):  https://${ts_name}:8080/"
+    echo "hermes dashboard:   https://${ts_name}:9119/"
+    echo "speedtest tracker:  https://${ts_name}:8765/"
+    echo "lm studio api:      https://${ts_name}:1234/v1"
+    echo "================================================================"
+}
+
 confirm_github_config() {
     echo "================================================================"
     echo "github configuration"
@@ -137,6 +173,7 @@ main() {
             sudo docker compose -f $SCRIPT_DIR/docker/docker-compose.yml up -d; \
         fi"
     echo "----------------------------------------------------------------"
+    setup_tailnet
     echo "==> setup complete"
     echo
     confirm_github_config

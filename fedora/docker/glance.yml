@@ -20,7 +20,7 @@ theme:
 
 pages:
   - name: Startpage
-    width: slim
+    width: wide
     center-vertically: true
     columns:
       - size: full
@@ -38,9 +38,6 @@ pages:
                 url: http://localhost:9119
               - title: LM Studio API
                 url: http://localhost:1234/v1/models
-              - title: n8n
-                url: http://localhost:5678
-                icon: si:n8n
               - title: Speedtest Tracker
                 url: http://localhost:8765
 
@@ -77,6 +74,7 @@ pages:
                     url: https://www.instagram.com/
 
   - name: Home
+    width: wide
     columns:
       - size: small
         widgets:
@@ -118,8 +116,6 @@ pages:
                 url: http://localhost:9119
               - title: lm studio api
                 url: http://localhost:1234/v1/models
-              - title: n8n (automation)
-                url: http://localhost:5678
               - title: speedtest tracker
                 url: http://localhost:8765
 
@@ -160,8 +156,6 @@ pages:
                     url: http://localhost:8080
                   - title: hermes dashboard
                     url: http://localhost:9119
-                  - title: n8n (automation)
-                    url: http://localhost:5678
                   - title: speedtest tracker
                     url: http://localhost:8765
                   - title: homelab repo
@@ -185,10 +179,10 @@ pages:
               - open-webui/open-webui
               - NousResearch/hermes-agent
               - badlogic/pi-mono
-              - n8n-io/n8n
               - alexjustesen/speedtest-tracker
 
   - name: Markets
+    width: wide
     columns:
       - size: small
         widgets:

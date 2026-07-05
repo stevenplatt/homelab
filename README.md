@@ -27,11 +27,10 @@ After setup, these are reachable in a browser (localhost, or over your tailnet v
 | Glance | [http://localhost:8181](http://localhost:8181) | none | Homelab dashboard: service health, bookmarks |
 | Open WebUI | [http://localhost:8080](http://localhost:8080) | none (auth disabled) | Browser chat with the local Qwen model |
 | Hermes dashboard | [http://localhost:9119](http://localhost:9119) | none | Hermes config, API keys, sessions |
-| n8n | [http://localhost:5678](http://localhost:5678) | created on first visit | Workflow automation; AI nodes can use the LM Studio endpoint (`http://host.docker.internal:1234/v1`) |
 | Speedtest Tracker | [http://localhost:8765](http://localhost:8765) | `admin@example.com` / `password` — change it | Hourly internet speed tests with history graphs |
 | LM Studio API | [http://localhost:1234/v1](http://localhost:1234/v1) | none | OpenAI-compatible inference endpoint (API, not a UI) |
 
-n8n has no default credentials — the first visit prompts you to create the owner account. Speedtest Tracker ships with the default login above; change the password under Settings → Profile after first sign-in.
+Speedtest Tracker ships with the default login above; change the password under Settings → Profile after first sign-in.
 
 ```sh
 git clone https://github.com/stevenplatt/homelab.git
@@ -45,19 +44,17 @@ When finished it prints your git identity and SSH public key for pasting into [g
 
 Two things need a one-time manual step after `setup.sh` finishes.
 
-**Tailscale** is installed and running, but the machine must be joined to your tailnet:
+**Tailscale** — setup.sh handles this at the end of its run: it runs `sudo tailscale up` (which prints a login URL — open it in a browser to authenticate, first run only), then uses Tailscale Serve to publish every homelab service over HTTPS to your tailnet, and prints the resulting URLs. Services stay bound to localhost — nothing is exposed publicly. From any device on your tailnet:
 
-```sh
-sudo tailscale up          # prints a login URL — open it and authenticate
-tailscale status           # confirm the machine appears on your tailnet
-```
+| Service | Tailnet address |
+| --- | --- |
+| Glance | `https://<machine>.<tailnet>.ts.net/` |
+| Open WebUI | `https://<machine>.<tailnet>.ts.net:8080/` |
+| Hermes dashboard | `https://<machine>.<tailnet>.ts.net:9119/` |
+| Speedtest Tracker | `https://<machine>.<tailnet>.ts.net:8765/` |
+| LM Studio API | `https://<machine>.<tailnet>.ts.net:1234/v1` |
 
-To reach the local dashboards from other tailnet devices without exposing them publicly, proxy them with Tailscale Serve (they stay bound to localhost):
-
-```sh
-tailscale serve --bg 9119  # hermes dashboard
-tailscale serve --bg 8181  # glance
-```
+setup.sh prints these with your machine's actual MagicDNS name filled in. Requires [MagicDNS and HTTPS enabled](https://tailscale.com/kb/1153/enabling-https) on your tailnet (Tailscale admin console → DNS) — certificates are then provisioned automatically.
 
 **Hermes ↔ Slack** uses Slack Socket Mode — an outbound connection from the machine, so no Tailscale, ports, or Nous account are involved. Create the Slack app once by hand: run `hermes slack manifest --write`, paste the manifest at [api.slack.com/apps](https://api.slack.com/apps) (create new app → from manifest), and install it to your workspace. Then export the tokens and re-run setup:
 
