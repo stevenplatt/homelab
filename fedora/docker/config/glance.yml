@@ -19,66 +19,6 @@ theme:
   negative-color: 6 96 59
 
 pages:
-  - name: Startpage
-    width: wide
-    center-vertically: true
-    columns:
-      - size: full
-        widgets:
-          - type: search
-            autofocus: true
-
-          # TS_DNS_NAME comes from the container env (set by setup.sh via
-          # docker/config/.env) so links work from any tailnet device. urls go
-          # through the caddy https proxy — port map in ./Caddyfile (same folder)
-          - type: monitor
-            cache: 1m
-            title: Services
-            sites:
-              - title: Open WebUI (chat)
-                url: https://${TS_DNS_NAME}:8443
-              - title: Hermes dashboard
-                url: https://${TS_DNS_NAME}:9443
-                # the root 302-redirects to the auth login; probe the
-                # unauthenticated status endpoint for health instead
-                check-url: https://${TS_DNS_NAME}:9443/api/status
-              - title: LM Studio API
-                url: https://${TS_DNS_NAME}:5443/v1/models
-              - title: Speedtest Tracker
-                url: https://${TS_DNS_NAME}:7443
-
-          - type: bookmarks
-            groups:
-              - title: Homelab
-                links:
-                  - title: Homelab repo
-                    url: https://github.com/stevenplatt/homelab
-                    icon: si:github
-              - title: General
-                links:
-                  - title: Gmail
-                    url: https://mail.google.com/mail/u/0/
-                  - title: Amazon
-                    url: https://www.amazon.com/
-                  - title: Github
-                    url: https://github.com/
-              - title: Entertainment
-                links:
-                  - title: YouTube
-                    url: https://www.youtube.com/
-                  - title: Prime Video
-                    url: https://www.primevideo.com/
-                  - title: Disney+
-                    url: https://www.disneyplus.com/
-              - title: Social
-                links:
-                  - title: Reddit
-                    url: https://www.reddit.com/
-                  - title: Twitter
-                    url: https://twitter.com/
-                  - title: Instagram
-                    url: https://www.instagram.com/
-
   - name: Home
     width: wide
     columns:
@@ -145,11 +85,124 @@ pages:
             style: grid-cards
             collapse-after-rows: 2
             channels:
-              - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
-              - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
+              - UCoL8olX-259lS1N6QPyP4IQ # Action Retro
+              - UC-y2mkf95VCf5zjEzigiVDw # AdrianXpression
+              - UCkdgAA0rfK7lG5dv4o__Paw # Alberta Tech
+              - UCNCg231F4jeJ6DjjcYv0MGg # Alternative Brewing
+              - UCBABCFhPeGFwW8WdjoQjk3Q # Andrew Robinson
+              - UC1LpsuAUaKoMzzJSEt5WImw # Asianometry
+              - UC2J-0g_nxlwcD9JBK1eTleQ # Auto Focus
+              - UCEbFX3P9ADiJvle5Z0Qyw2A # Becca Farsace
+              - UCDXTQ8nWmx_EhZ2v-kp7QxA # Ben Felix
+              - UCTGrgT-Ld4kH3CxHnCMGn8w # Big Car
+              - UCNHvaSfvKZbKJsQG8nq8lRg # Bloom Audio
+              - UCUMZ7gohGI9HcU9VNsr2FJQ # Bloomberg Originals
+              - UCi7cIUhc2tuAf6_3FrKgcfg # Bob The Drag Queen
+              - UC5k3Kc0avyDJ2nG9Kxm9JmQ # Bright Sun Films
+              - UCHudN_9O_OD5KQIueahpYvg # Bright Sun Travels
+              - UCGQ3yQ0mbQqO6bY6eqsbjGQ # CalebRated
+              - UCxMAbVFmxKUVGAll0WVGpFw # Cardi B
+              - UCUhFaUpnq31m6TNX2VKVSVA # carwow
+              - UCGc8ZVCsrR3dAuhvUbkbToQ # City Beautiful
+              - UCvJJ_dzjViJCoLf5uKUTwoA # CNBC
+              - UCFQMnBA3CS502aghlcr0_aw # Coffeezilla
+              - UC4QZ_LsYcvcq7qOsOhpAX4A # ColdFusion
+              - UCurv9zw0LturSVaqI6NgdrQ # crinacle
+              - UCu7x43fFlwbBykF1r04T_wQ # Daddy Got Coffee
+              - UC6_8mLw-CglRDk3y8HKGnNQ # Daniel Titchener
+              - UCQIcXQ2n0sa-7CD0NtqnrrA # Darko Audio
+              - UCVYamHliCI9rw1tHR1xbkfw # Dave2D
+              - UCs6k0OjZMVc7s7DbVrD6gRw # Delta Sigma Phi
+              - UCYeiozh-4QwuC1sjgCmB92w # DevOps Toolbox
+              - UCLdBr5f6RcP6l_TAP4GkhDQ # DF Clips
+              - UC7WtLipHnndkqwSxvL0oyVQ # DMS
+              - UCZ4AMrDcNrfy3X6nsU8-rPg # Economics Explained
+              - UCF8e8zKZ_yk7cL9DvvWGSEw # Edmunds Cars
+              - UC9rU_5YnMDUPc0IP8NwZOig # Elevated Systems
+              - UC-6OW5aJYBFM33zXQlBKPNA # Engadget
+              - UCDq5v10l4wkV5-ZBIJJFbzQ # Ethan Chlebowski
+              - UCfzWwxboCLyLw7KVfQj84eA # Extra Throttle House
               - UCsBjURrPoezykLs9EqgamOA # Fireship
+              - UCyNtlmLB73-7gtlBz00XOQQ # Folding Ideas
+              - UC9CifUFEqSpuF9tTGpKxC4g # Fuji Guys Channel
+              - UCLU3L9RznREsypblMiNZLuQ # GadgetryTech
+              - UC5Ghe5TBQGYIOANuiNW4hDQ # Garys Economics
+              - UCkFEHYeTvdeB0T_UGX_g6vw # GRANT KNOCHE
+              - UCEjPTUaMGPD_uGEt8u6Tqgw # Highnote
+              - UCvzv9fsofrazOYNwoARrzag # Home Cafe by Charlie
+              - UCnorhjQR4zJkT7AVNhu395Q # Home RenoVision DIY
+              - UCucot-Zp428OwkyRm2I7v2Q # James Charles
+              - UCMb0O2CdPBNi-QqPk5T3gsQ # James Hoffmann
+              - UCQoOmu6mKZkXTnwZcpD8Ciw # Jason Schreier
+              - UC98saSu1w3i9w-PG8Tsfi3Q # JoJo
+              - UCp9hJSTr4zj4bDoGAusKpWQ # JonnyCakes
+              - UCx9bOYEjkevIDYONBAstK-A # Joshua Valour
+              - UCi8C7TNs2ohrc6hnRQ5Sn2w # Kai Lentit
+              - UCj9yUGuMVVdm2DqyvJPUeUQ # Kelley Blue Book
+              - UCgBVkKoOAr3ajSdFFLp13_A # KRAZAM
+              - UCGzGbfhdFsjP1yfJUEpSvWg # KYLE HANAGAMI
+              - UCgsZdXymTMEgCx15V_linDw # Lauro Dominici
+              - UCOWcZ6Wicl-1N34H0zZe38w # Level1Linux
+              - UCd4XwUn2Lure2NHHjukoCwA # Linux For Everyone
+              - UCtwzsvzRCfPddq2gPlgKW1w # Lone Fox
+              - UC9-4F7Dtqxoi30gmbRgbSTA # marc insco
+              - UCurpiDXSkcUbgdMwHNZkrCg # Mariah Carey
               - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
-              - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+              - UCJ24N4O0bP7LGLBDvye7oCA # Matt D'Avella
+              - UCWzKMFfIlMzHUXKSnYot5HA # Mina Protocol
+              - UCjFaPUcJU1vwk193mnW_w1w # Modern Vintage Gamer
+              - UCCKpicnIwBP3VPxBAZWDeNA # Money & Macro
+              - UCEkuogE57xac9EPZ3EZwWIg # Morgan Eckroth
+              - UC7oIaIC1DAEMDdgScBoJzMA # MrAyrit
+              - UCSOpcUkE-is7u7c4AkLgqTw # MrMobile [Michael Fisher]
+              - UCPUjf6TfExQ-hOn51bklHcw # Mystic
+              - UC36xmz34q02JYaZYKrMwXng # Nate Gentile
+              - UCLiAWvpRFtNiVOu6OyEfmDA # Nicholas Garofola
+              - UCnjhet_jt-oijILXoOzCZjg # Nick Lewis
+              - UC7qPftDWPw9XuExpSgfkmJQ # Nostalgia Nerd
+              - UC0intLFzLaudFG-xAvUEO-A # Not Just Bikes
+              - UCrT2KUIIrDPJk8leVu7GYdQ # o1Labs
+              - UCj-HXcV_9o06Vhmoxa-9dJg # ODOOJI
+              - UCASM0cgfkJxQ1ICmRilfHLw # Patrick Boyle
+              - UCRhADYLTpsb0JA-uaLWovGw # PCMag
+              - UCX9UWjFzaq6lHNM4tGsVUQA # Pixel Playback
+              - UCgNg3vwj3xt7QOrcIDaHdFg # PolyMatter
+              - UCfgtNfWCtsLKutY-BHzIb9Q # Ray Delahanty | CityNerd
+              - UCvHTmlCbEhgDvC5VdpVAG2A # RealChrisBaca
+              - UCEQiEyMO9ci0Y-KwLOF4ysQ # Rebal D
+              - UCUd3NzP232n-zcGW-b1m6Qw # Resolve
+              - UCoZQiN0o7f36H7PaW4fVhFw # Retro Game Corps
+              - UCOYMhBR9_wKh-zkXPQ8W1cw # Ryan Walker
+              - UCgUvk6jVaf-1uKOqG8XNcaQ # savagegeese
+              - UCZOUJF5RwN60tkTIijiDn-g # Sheer Element
+              - UC8yzliNnrIbds1lTfYLa9-g # Sofia Figure Skates
+              - UC2q-Z0ir6OEMpvlAZGil6nA # Straightmen
+              - UCLt1ZCWX6QCDWVUElrY5_qA # Super* Review
+              - UCtZO3K2p8mqFwiKWb9k7fXA # TechAltar
+              - UCOk-gHyjcWZNj3Br4oxwh0A # Techno Tim
+              - UCRX8EMfveYR35Z8PGmlYnpw # The Coffee Chronicler
+              - UCRG_N2uO405WO4P3Ruef9NA # The Friday Checkout
+              - UCo-RDlyRDeQ3ZrBK9w6tmGw # The Full Nerd Network
+              - UCt44wdefZzrhNDYYAyEy3Xg # The Headphone Show
+              - UC5UAwBUum7CPN5buc-_N1Fw # The Linux Experiment
+              - UCFCEuCsyWP0YkP3CZ3Mr01Q # The Plain Bagel
+              - UCUyeluBRhGPCW4rPe_UvBZQ # The PrimeTime
+              - UCddiUEpeqJcYeBxX1IVBKvQ # The Verge
+              - UChk6TQce1EJMn6_liKdHDog # ThePrimeagenHighlights
+              - UCKles8LxldTEiRTIQ8Rq5oA # Thray
+              - UCyXiDU5qjfOPxgOPeFWGwKw # Throttle House
+              - UCag8IfaCHYYtmRItd3zenvA # Two Gay Matts
+              - UCsUvbaRqVEUVQwoVe9dTv9A # TylersEclectic
+              - UCo71RUe6DX4w-Vd47rFLXPg # typecraft
+              - UC28n0tlcNSa1iPe5mettocg # voidzilla
+              - UCI173f1eHDhz_aj8rTRNG9A # WaterField Designs
+              - UCc_ycus0q7DSd85ZkmEY5ig # Waveform Clips
+              - UC-yfie28pjtcAnT6EL_r0xg # Workin' with Wolkon
+              - UCr613nJgA50o8DUUT00qHvw # WULFF DEN
+              - UCPk41GIcjo_esggMgsV2rKQ # WULFF DEN Podcast - Weekly Gaming Recap
+              - UCsfasHJphdMDFkcse5sQ9Uw # Zac Rios
+              - UCWs7VfYmoynENET1XWaubCQ # Zach Campbell
+              - UC4wbCxRPSrkbp5BNsNczbIQ # ZazenCodes
 
       - size: small
         widgets:
@@ -171,13 +224,37 @@ pages:
 
           - type: bookmarks
             groups:
-              - title: homelab
+              - title: General
                 links:
-                  - title: open webui (chat)
-                    url: https://${TS_DNS_NAME}:8443
-                  - title: hermes dashboard
-                    url: https://${TS_DNS_NAME}:9443
-                  - title: speedtest tracker
-                    url: https://${TS_DNS_NAME}:7443
-                  - title: homelab repo
-                    url: https://github.com/stevenplatt/homelab
+                  - title: Gmail
+                    url: https://mail.google.com/mail/u/0/
+                    icon: si:gmail
+                  - title: Amazon
+                    url: https://www.amazon.com/
+                    icon: si:amazon
+                  - title: Github
+                    url: https://github.com/
+                    icon: si:github
+              - title: Entertainment
+                links:
+                  - title: YouTube
+                    url: https://www.youtube.com/
+                    icon: si:youtube
+                  - title: Prime Video
+                    url: https://www.primevideo.com/
+                    icon: si:primevideo
+                  - title: Disney+
+                    url: https://www.disneyplus.com/
+                    # simple-icons dropped disneyplus — dashboard-icons has it
+                    icon: di:disney-plus
+              - title: Social
+                links:
+                  - title: Reddit
+                    url: https://www.reddit.com/
+                    icon: si:reddit
+                  - title: Twitter
+                    url: https://twitter.com/
+                    icon: si:twitter
+                  - title: Instagram
+                    url: https://www.instagram.com/
+                    icon: si:instagram
