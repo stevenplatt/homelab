@@ -22,12 +22,16 @@ Configuration scripts for my personal homelab: workstation provisioning, local A
 
 After setup, these are reachable in a browser (localhost, or over your tailnet via `tailscale serve`):
 
-| Service | Address | What it's for |
-| --- | --- | --- |
-| Glance | [http://localhost:8181](http://localhost:8181) | Homelab dashboard: service health, bookmarks |
-| Open WebUI | [http://localhost:8080](http://localhost:8080) | Browser chat with the local Qwen model |
-| Hermes dashboard | [http://localhost:9119](http://localhost:9119) | Hermes config, API keys, sessions |
-| LM Studio API | [http://localhost:1234/v1](http://localhost:1234/v1) | OpenAI-compatible inference endpoint (API, not a UI) |
+| Service | Address | Login | What it's for |
+| --- | --- | --- | --- |
+| Glance | [http://localhost:8181](http://localhost:8181) | none | Homelab dashboard: service health, bookmarks |
+| Open WebUI | [http://localhost:8080](http://localhost:8080) | none (auth disabled) | Browser chat with the local Qwen model |
+| Hermes dashboard | [http://localhost:9119](http://localhost:9119) | none | Hermes config, API keys, sessions |
+| n8n | [http://localhost:5678](http://localhost:5678) | created on first visit | Workflow automation; AI nodes can use the LM Studio endpoint (`http://host.docker.internal:1234/v1`) |
+| Speedtest Tracker | [http://localhost:8765](http://localhost:8765) | `admin@example.com` / `password` — change it | Hourly internet speed tests with history graphs |
+| LM Studio API | [http://localhost:1234/v1](http://localhost:1234/v1) | none | OpenAI-compatible inference endpoint (API, not a UI) |
+
+n8n has no default credentials — the first visit prompts you to create the owner account. Speedtest Tracker ships with the default login above; change the password under Settings → Profile after first sign-in.
 
 ```sh
 git clone https://github.com/stevenplatt/homelab.git

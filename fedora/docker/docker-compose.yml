@@ -34,5 +34,39 @@ services:
       - ./glance.yml:/app/config/glance.yml:ro
     restart: unless-stopped
 
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n-data:/home/node/.n8n
+    environment:
+      # allow login over plain http (localhost / tailnet)
+      - N8N_SECURE_COOKIE=false
+    extra_hosts:
+      # ai nodes can use the local lm studio endpoint:
+      # base url http://host.docker.internal:1234/v1, any api key
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest-tracker
+    ports:
+      - "8765:80"
+    volumes:
+      - speedtest-data:/config
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - DB_CONNECTION=sqlite
+      # laravel encryption key for the local speedtest db — rotate if desired
+      - APP_KEY=base64:fBxcn/qHsMDWOHDhy3rkDIUJVIYcFS5ta4SxWXclS4Y=
+      - SPEEDTEST_SCHEDULE=0 * * * * # run a speedtest hourly
+    restart: unless-stopped
+
 volumes:
   open-webui-data:
+  n8n-data:
+  speedtest-data:

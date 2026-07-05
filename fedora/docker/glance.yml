@@ -2,15 +2,80 @@
 # the glance container by docker-compose.yml. edit, then re-run ../setup.sh
 # (or `docker compose restart glance`) to apply.
 #
-# layout is glance's official example dashboard with the homelab services
-# integrated (monitor + bookmarks + releases). the container uses host
-# networking, so all urls are plain localhost — valid for both the health
-# checks and clicking through from the browser.
+# pages are glance's official preconfigured examples with the homelab
+# services integrated:
+#   https://github.com/glanceapp/glance/blob/main/docs/preconfigured-pages.md
+# the container uses host networking, so all urls are plain localhost —
+# valid for both the health checks and clicking through from the browser.
 # widget reference: https://github.com/glanceapp/glance/blob/main/docs/configuration.md
 server:
   port: 8181
 
+# gruvbox dark theme: https://github.com/glanceapp/glance/blob/main/docs/themes.md#gruvbox-dark
+theme:
+  background-color: 0 0 16
+  primary-color: 43 59 81
+  positive-color: 61 66 44
+  negative-color: 6 96 59
+
 pages:
+  - name: Startpage
+    width: slim
+    center-vertically: true
+    columns:
+      - size: full
+        widgets:
+          - type: search
+            autofocus: true
+
+          - type: monitor
+            cache: 1m
+            title: Services
+            sites:
+              - title: Open WebUI (chat)
+                url: http://localhost:8080
+              - title: Hermes dashboard
+                url: http://localhost:9119
+              - title: LM Studio API
+                url: http://localhost:1234/v1/models
+              - title: n8n
+                url: http://localhost:5678
+                icon: si:n8n
+              - title: Speedtest Tracker
+                url: http://localhost:8765
+
+          - type: bookmarks
+            groups:
+              - title: Homelab
+                links:
+                  - title: Homelab repo
+                    url: https://github.com/stevenplatt/homelab
+                    icon: si:github
+              - title: General
+                links:
+                  - title: Gmail
+                    url: https://mail.google.com/mail/u/0/
+                  - title: Amazon
+                    url: https://www.amazon.com/
+                  - title: Github
+                    url: https://github.com/
+              - title: Entertainment
+                links:
+                  - title: YouTube
+                    url: https://www.youtube.com/
+                  - title: Prime Video
+                    url: https://www.primevideo.com/
+                  - title: Disney+
+                    url: https://www.disneyplus.com/
+              - title: Social
+                links:
+                  - title: Reddit
+                    url: https://www.reddit.com/
+                  - title: Twitter
+                    url: https://twitter.com/
+                  - title: Instagram
+                    url: https://www.instagram.com/
+
   - name: Home
     columns:
       - size: small
@@ -45,6 +110,10 @@ pages:
                 url: http://localhost:9119
               - title: lm studio api
                 url: http://localhost:1234/v1/models
+              - title: n8n (automation)
+                url: http://localhost:5678
+              - title: speedtest tracker
+                url: http://localhost:8765
 
           - type: group
             widgets:
@@ -70,6 +139,59 @@ pages:
 
       - size: small
         widgets:
+          # community widget: https://github.com/glanceapp/community-widgets/blob/main/widgets/epic-free-widget/README.md
+          - type: custom-api
+            title: Epic Games
+            cache: 1h
+            url: https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en&country=US&allowCountries=US
+            template: |
+              <div>
+                {{ if eq .Response.StatusCode 200 }}
+                  <div class="horizontal-cards-2">
+                    {{ range .JSON.Array "data.Catalog.searchStore.elements" }}
+                      {{ $price := .String "price.totalPrice.discountPrice" }}
+                      {{ $hasPromo := gt (len (.Array "promotions.promotionalOffers")) 0 }}
+                      {{ if and $hasPromo (eq $price "0") }}
+                        {{ $gamePage := .String "productSlug" }}
+                        {{ if gt (len (.Array "offerMappings")) 0 }}
+                          {{ $gamePage = .String "offerMappings.0.pageSlug" }}
+                        {{end }}
+                        <a href="https://store.epicgames.com/en-US/p/{{ $gamePage }}" target="_blank" class="card">
+                          {{ $title := .String "title" }}
+                          {{ range .Array "keyImages" }}
+                            {{ if eq (.String "type") "OfferImageWide" }}
+                              <img src="{{ .String "url" }}" alt="{{ $title }}" style="width: 100%; max-width: 300px; height: 150px; object-fit: cover; border-radius: var(--border-radius);">
+                            {{ end }}
+                          {{ end }}
+                          <div class="card-content">
+                            <span class="size-base color-primary">{{ $title }}</span><br>
+                            <span class="size-h5 color-subdue">
+                              {{ if $hasPromo }}
+                                {{ $promotions := .Array "promotions.promotionalOffers" }}
+                                {{ if gt (len $promotions) 0 }}
+                                  {{ $firstPromo := index $promotions 0 }}
+                                  {{ $offers := $firstPromo.Array "promotionalOffers" }}
+                                  {{ if gt (len $offers) 0 }}
+                                    {{ $firstOffer := index $offers 0 }}
+                                    Free until {{ slice ($firstOffer.String "endDate") 0 10 }}
+                                  {{ else }}
+                                    Free this week!
+                                  {{ end }}
+                                {{ else }}
+                                  Free this week!
+                                {{ end }}
+                              {{ end }}
+                            </span>
+                          </div>
+                        </a>
+                      {{ end }}
+                    {{ end }}
+                  </div>
+                {{ else }}
+                  <p class="color-negative">Error fetching Epic Games data.</p>
+                {{ end }}
+              </div>
+
           - type: weather
             location: San Francisco, United States # change to your city
             units: imperial
@@ -83,6 +205,10 @@ pages:
                     url: http://localhost:8080
                   - title: hermes dashboard
                     url: http://localhost:9119
+                  - title: n8n (automation)
+                    url: http://localhost:5678
+                  - title: speedtest tracker
+                    url: http://localhost:8765
                   - title: homelab repo
                     url: https://github.com/stevenplatt/homelab
 
@@ -104,3 +230,84 @@ pages:
               - open-webui/open-webui
               - NousResearch/hermes-agent
               - badlogic/pi-mono
+              - n8n-io/n8n
+              - alexjustesen/speedtest-tracker
+
+  - name: Markets
+    columns:
+      - size: small
+        widgets:
+          - type: markets
+            title: Indices
+            markets:
+              - symbol: SPY
+                name: S&P 500
+              - symbol: DX-Y.NYB
+                name: Dollar Index
+
+          - type: markets
+            title: Crypto
+            markets:
+              - symbol: BTC-USD
+                name: Bitcoin
+              - symbol: ETH-USD
+                name: Ethereum
+
+          - type: markets
+            title: Stocks
+            sort-by: absolute-change
+            markets:
+              - symbol: NVDA
+                name: NVIDIA
+              - symbol: AAPL
+                name: Apple
+              - symbol: MSFT
+                name: Microsoft
+              - symbol: GOOGL
+                name: Google
+              - symbol: AMD
+                name: AMD
+              - symbol: RDDT
+                name: Reddit
+              - symbol: AMZN
+                name: Amazon
+              - symbol: TSLA
+                name: Tesla
+              - symbol: INTC
+                name: Intel
+              - symbol: META
+                name: Meta
+
+      - size: full
+        widgets:
+          - type: group
+            widgets:
+              - type: reddit
+                show-thumbnails: true
+                subreddit: technology
+              - type: reddit
+                show-thumbnails: true
+                subreddit: wallstreetbets
+
+          - type: videos
+            style: grid-cards
+            collapse-after-rows: 3
+            channels:
+              - UCvSXMi2LebwJEM1s4bz5IBA
+              - UCV6KDgJskWaEckne5aPA0aQ
+              - UCAzhpt9DmG6PnHXjmJTvRGQ
+
+      - size: small
+        widgets:
+          # reuters has no native rss — google news site-filtered feeds
+          # link directly to reuters.com articles
+          - type: rss
+            title: News
+            limit: 30
+            collapse-after: 13
+            feeds:
+              - url: "https://news.google.com/rss/search?q=site:reuters.com+markets&hl=en-US&gl=US&ceid=US:en"
+                title: Reuters Markets
+              - url: "https://news.google.com/rss/search?q=site:reuters.com+business&hl=en-US&gl=US&ceid=US:en"
+                title: Reuters Business
+
