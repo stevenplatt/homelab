@@ -50,16 +50,18 @@ pages:
           - type: group
             widgets:
               - type: hacker-news
+                limit: 5
               - type: lobsters
+                limit: 5
 
           - type: group
             widgets:
               - type: rss
-                title: Reuters
+                title: Semafor
                 limit: 10
                 feeds:
-                  - url: "https://news.google.com/rss/search?q=site:reuters.com&hl=en-US&gl=US&ceid=US:en"
-                    title: Reuters
+                  - url: https://www.semafor.com/rss.xml
+                    title: Semafor
               - type: rss
                 title: Engadget
                 limit: 10
@@ -72,6 +74,12 @@ pages:
                 feeds:
                   - url: https://feeds.arstechnica.com/arstechnica/index
                     title: Ars Technica
+              - type: rss
+                title: Car & Driver
+                limit: 10
+                feeds:
+                  - url: https://www.caranddriver.com/rss/all.xml/
+                    title: Car & Driver
 
           - type: videos
             title: YouTube
