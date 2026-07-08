@@ -244,14 +244,13 @@ pages:
                     url: https://www.disneyplus.com/
                     # simple-icons dropped disneyplus — dashboard-icons has it
                     icon: di:disney-plus
-              - title: Social
+              - title: Telecomsteve
                 links:
-                  - title: Reddit
-                    url: https://www.reddit.com/
-                    icon: si:reddit
-                  - title: Twitter
-                    url: https://twitter.com/
-                    icon: si:twitter
-                  - title: Instagram
-                    url: https://www.instagram.com/
-                    icon: si:instagram
+                  - title: telecomsteve
+                    url: https://telecomsteve.com/
+                  - title: AlgoMonster
+                    url: https://algo.monster/dashboard
+                  - title: Keychron
+                    url: https://launcher.keychron.com/#/keymap
+                  - title: Haydel Bakery
+                    url: https://haydelsbakery.com/
