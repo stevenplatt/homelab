@@ -13,6 +13,7 @@
 #   9443 → hermes dashboard  (tailnet-bound :9119)
 #   7443 → speedtest tracker (localhost:8765)
 #   5443 → lm studio api     (localhost:1234)
+#   3443 → adguard home      (localhost:3000)
 
 {$TS_DNS_NAME} {
 	reverse_proxy localhost:8181
@@ -34,4 +35,8 @@
 
 {$TS_DNS_NAME}:5443 {
 	reverse_proxy localhost:1234
+}
+
+{$TS_DNS_NAME}:3443 {
+	reverse_proxy localhost:3000
 }

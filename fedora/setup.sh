@@ -113,8 +113,11 @@ setup_tailnet() {
         sudo tailscale up
     fi
 
-    local ts_name
+    local ts_name ts_ip
     ts_name="$(tailscale status --json | jq -r '.Self.DNSName' | sed 's/\.$//')"
+    # tailnet ipv4 — adguard binds it on :53 so the tailnet can use adguard as
+    # its dns (tailscale queries nameservers on 53 only). fed to compose below.
+    ts_ip="$(tailscale ip -4 | head -n1)"
 
     # rebind the hermes dashboard to the tailnet dns name (it validates the
     # Host header, so it cannot sit behind `tailscale serve` — see hermes.sh)
@@ -133,12 +136,14 @@ setup_tailnet() {
     # the tailnet: https://tailscale.com/kb/1153/enabling-https
     local docker_env="$SCRIPT_DIR/docker/config/.env"
     touch "$docker_env"
-    sed -i '/^TS_DNS_NAME=/d;/^TS_SCHEME=/d;/^SPEEDTEST_APP_URL=/d;/^APP_URL=/d' "$docker_env"
-    printf 'TS_DNS_NAME=%s\nAPP_URL=https://%s:7443\n' "$ts_name" "$ts_name" >> "$docker_env"
+    sed -i '/^TS_DNS_NAME=/d;/^TS_SCHEME=/d;/^SPEEDTEST_APP_URL=/d;/^APP_URL=/d;/^TS_IP=/d' "$docker_env"
+    printf 'TS_DNS_NAME=%s\nAPP_URL=https://%s:7443\nTS_IP=%s\n' "$ts_name" "$ts_name" "$ts_ip" >> "$docker_env"
+    # --env-file makes compose interpolate ${TS_IP} in adguard's port binding
+    # from config/.env (deterministic under sudo; no reliance on env inheritance)
     if docker info > /dev/null 2>&1; then
-        docker compose -f "$SCRIPT_DIR/docker/docker-compose.yml" up -d > /dev/null 2>&1
+        docker compose --env-file "$docker_env" -f "$SCRIPT_DIR/docker/docker-compose.yml" up -d > /dev/null 2>&1
     else
-        sudo docker compose -f "$SCRIPT_DIR/docker/docker-compose.yml" up -d > /dev/null 2>&1
+        sudo docker compose --env-file "$docker_env" -f "$SCRIPT_DIR/docker/docker-compose.yml" up -d > /dev/null 2>&1
     fi
 
     echo "================================================================"
@@ -151,6 +156,9 @@ setup_tailnet() {
     echo "                    (login: HERMES_DASHBOARD_BASIC_AUTH_* in ~/.hermes/.env)"
     echo "speedtest tracker:  https://${ts_name}:7443/"
     echo "lm studio api:      https://${ts_name}:5443/v1"
+    echo "adguard home:       https://${ts_name}:3443/"
+    echo "                    (tailnet dns: add ${ts_ip}:53 as a nameserver"
+    echo "                     at https://login.tailscale.com/admin/dns)"
     echo "================================================================"
 }
 
@@ -193,7 +201,7 @@ main() {
     # seed config/.env so the containers start with localhost urls before
     # the tailnet step rewrites it with the real dns name
     run_step "web services (docker compose)" "\
-        echo '==> starting web services (open-webui, glance, speedtest, caddy)'; \
+        echo '==> starting web services (open-webui, glance, speedtest, adguard, caddy)'; \
         [ -f $SCRIPT_DIR/docker/config/.env ] || printf 'TS_DNS_NAME=localhost\n' > $SCRIPT_DIR/docker/config/.env; \
         if docker info > /dev/null 2>&1; then \
             docker compose -f $SCRIPT_DIR/docker/docker-compose.yml up -d; \

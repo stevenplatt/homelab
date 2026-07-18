@@ -219,6 +219,12 @@ pages:
               - title: speedtest tracker
                 url: https://${TS_DNS_NAME}:7443
 
+              - title: adguard home
+                url: https://${TS_DNS_NAME}:3443
+                # root 302-redirects to the login page when auth is enabled;
+                # probe the login page directly for a clean 200 health check
+                check-url: https://${TS_DNS_NAME}:3443/login.html
+
           - type: bookmarks
             groups:
               - title: General

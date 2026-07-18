@@ -64,6 +64,40 @@ services:
         required: false
     restart: unless-stopped
 
+  adguard:
+    image: adguard/adguardhome:latest
+    container_name: adguard
+    # bridge networking with explicit port publishing so we control exactly
+    # which host ports are used. host networking is deliberately avoided: it
+    # would make adguard bind 0.0.0.0:53 and collide with fedora's
+    # systemd-resolved stub listener (127.0.0.53:53), so the container would
+    # refuse to start. tradeoff: bridge NAT means per-client query stats show
+    # the docker gateway ip rather than real client ips.
+    ports:
+      # DNS — bound to this machine's tailscale ip on port 53. tailscale's DNS
+      # feature only queries nameservers on 53 (no custom-port option), so this
+      # is how the tailnet reaches adguard: add ${TS_IP}:53 as a nameserver at
+      # login.tailscale.com/admin/dns. binding the *tailnet* ip specifically
+      # does NOT collide with fedora's systemd-resolved, which owns a different
+      # ip (127.0.0.53:53) — nothing native is disturbed. TS_IP is written to
+      # config/.env by ../setup.sh after the tailnet is joined (passed to
+      # compose via --env-file); the 127.0.0.1 fallback keeps a pre-join or
+      # plain `docker compose up` off resolved's ip.
+      - "${TS_IP:-127.0.0.1}:53:53/tcp"
+      - "${TS_IP:-127.0.0.1}:53:53/udp"
+      # web admin UI + first-run setup wizard. browse to http://<host>:3000
+      # (or over the tailnet via caddy — see config/Caddyfile). in the wizard,
+      # set the "Admin Web Interface" port to 3000 so the UI stays here after
+      # setup instead of moving to the container's default port 80 (unpublished).
+      - "3000:3000/tcp"
+    volumes:
+      - adguard-work:/opt/adguardhome/work
+      - adguard-conf:/opt/adguardhome/conf
+    environment:
+      # pacific time (handles PST/PDT automatically) — for the query log
+      - TZ=America/Los_Angeles
+    restart: unless-stopped
+
   caddy:
     image: caddy:latest
     container_name: caddy
@@ -85,5 +119,7 @@ services:
 volumes:
   open-webui-data:
   speedtest-data:
+  adguard-work:
+  adguard-conf:
   caddy-data:
   caddy-config:
